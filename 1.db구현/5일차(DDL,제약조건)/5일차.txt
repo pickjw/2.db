@@ -1,0 +1,668 @@
+5일차(DDL,제약조건,조인)
+
+
+<문제1>
+
+select ename,job,sal,decode(job,'ANALYST',sal*1.1,
+                                'CLERK',sal*1.15,
+                               'MANAGER',sal*1.2,sal) 급여인상액
+from emp
+order by sal desc;
+
+ENAME      JOB              SAL 급여인상액
+---------- --------- ---------- ----------
+KING       PRESIDENT       5000       5000
+FORD       ANALYST         3000       3300
+SCOTT      ANALYST         3000       3300
+JONES      MANAGER         2975       3570
+BLAKE      MANAGER         2850       3420
+CLARK      MANAGER         2450       2940
+ALLEN      SALESMAN        1600       1600
+TURNER     SALESMAN        1500       1500
+MILLER     CLERK           1300       1495
+WARD       SALESMAN        1250       1250
+MARTIN     SALESMAN        1250       1250
+
+ENAME      JOB              SAL 급여인상액
+---------- --------- ---------- ----------
+ADAMS      CLERK           1100       1265
+JAMES      CLERK            950     1092.5
+SMITH      CLERK            800        920
+
+14 개의 행이 선택되었습니다.
+
+->switch~case(다중 if 대용)
+
+=>형식) case 적용대상 필드명 when 조건식(분석가) then 결과1(계산식)
+                           ,,when 조건식(매니저) then 결과1(계산식2)
+                           else 결과 n
+
+        end 별칭명
+
+으로 변경하는 SQL구문을 작성하시오.
+
+=>select empno,ename,job,sal,case job when 'ANALYST' then sal*1.1
+                                      when 'CLERK' then sal*1.15
+                                      when 'MANAGER' then sal*1.2
+                                      else sal
+                              end "최종 금액"
+from emp
+order by sal desc;
+
+===================================================================
+<문제2>emp테이블에서 전체급여가 5000을 초과하는 각 업무에 대해서
+                       sum(sal) > 5000        group by job
+
+ 업무와 월급여의 합계를 출력하는 SQL을 작성하시오
+  job   sum(sal) "급여 합계"
+(단 업무중에서 MANAGER는 제외하고 월급여의 합계로 내림차순 하시오)
+    where 조건식    <>,!=,^=            order by 
+
+select job, sum(sal) "급여 합계"
+from emp
+where job <> 'MANAGER' 
+group by job
+having sum(sal) > 5000
+order by sum(sal) desc;
+
+<실행결과>
+
+JOB        급여 합계 =>별칭쓸것.
+--------- ----------
+ANALYST         6000
+SALESMAN        5600
+
+==================================>select2
+DDL->제약조건->조인->서브쿼리(테이블)->뷰->시컨스,,,,
+
+<문제3>conn test1/t1234
+
+SQL> desc b_prtest
+ 이름                                      널?      유형
+ ----------------------------------------- -------- -------------
+
+ ID                                                 NUMBER
+ NAME                                      NOT NULL VARCHAR2(10)
+ TEL                                                VARCHAR2(20)
+
+형식) alter table 수정t add (추가할 필드명 자료형 제약조건)
+ 필드를 추가,필드를 변경(필드이름을 변경?,자료형,,,)
+
+  데이터가 들어가 있으면 number<=>varchar2(X)
+  자료형의 크기를 늘릴수 있다.varchar2(10)--->varchar2(20) (O)
+                                        <---(X)
+형식)alter table 수정t modify (적용시킬 필드명 자료형 제약조건)
+
+sql>alter table b_prtest modify (tel varchar2(30));
+
+SQL> desc b_prtest
+ 이름                                      널?      유형
+ ----------------------------------------- -------- ----------------
+
+ ID                                                 NUMBER
+ NAME                                      NOT NULL VARCHAR2(10)
+ TEL                                                VARCHAR2(30)
+
+sql>alter table b_prtest modify (tel number(12));
+
+<문제4>불필요로하는 필드가 존재->삭제
+
+형식) alter table 수정t drop column 삭제시킬 필드명;
+
+sql>alter table b_prtest drop column tel;
+
+SQL> desc b_prtest
+ 이름                                      널?      유형
+ ----------------------------------------- -------- ------------------
+
+ ID                                                 NUMBER
+ NAME                                      NOT NULL VARCHAR2(10)
+ TEL                                                NUMBER(12)
+
+SQL> alter table b_prtest drop column tel;
+
+테이블이 변경되었습니다.
+
+SQL> desc b_prtest
+ 이름                                      널?      유형
+ ----------------------------------------- -------- ------------------
+
+ ID                                                 NUMBER
+ NAME                                      NOT NULL VARCHAR2(10)
+
+<문제5>필드이름을 변경?
+
+형식) alter table 수정t rename column 수정전 필드명 to 수정후 필드명
+sql>alter table b_prtest rename column name to irum;
+
+SQL> desc b_prtest
+ 이름                                      널?      유형
+ ----------------------------------------- -------- -----------------
+
+ ID                                                 NUMBER
+ IRUM                                      NOT NULL VARCHAR2(10)
+
+<문제6> ***제약조건(=>DB설계할때 중요한 구성요소)***
+
+DB관리->1.어떻하면 올바른 데이터값만 저장?=>제약조건이 필요한 이유
+        2.원하는 데이터를 언제든지 검색?=>select
+
+
+***제약조건의 종류****
+
+무결성 제약 조건의 개념과 종류
+제약 조건명 지정하기
+제약 조건 변경하기
+제약 조건의 비활성화와 CASCADE
+
+
+ 1.primary key(기본키)->1)테이블의 행(row)을 구분하는 키워드로 사용
+                      ->행을 구분시켜주는 필드에 부여
+                          id name address
+                           1  홍길동 서울시 강남구
+                           2  홍길동 서울시 강남구
+                         
+                         2)중복되면 안되는 필드에 부여=>데이터가 한번
+                            empno(사번), 계좌번호,주민등록번호
+
+                           중복허용 필드->name,sung,직책
+                         3)자동적으로 not null이 설정
+                         4)자동적으로 unique index키가 부여(빠른검색때문)
+                           =>색인,북마크(즐겨찾기)
+
+  2.not null (반드시 입력을 해야되는 필드에 부여)
+                       ex)회원가입 member  id,passwd,name,tel,address
+                                   쇼핑몰
+                          email->로그인할때 id사용(not null)
+                               ->null (있으면 쓰고,없으면 안쓰도록)
+          
+형식) alter table 수정t add constraint 제약조건이름 종류(적용필드명)
+                                       ============>삭제,변경
+                            (b_prtest_pk_id) 테이블명_제약조건약어_필드명
+
+
+오라클->sys~부여->시스템 테이블에 저장(자동의 경우)
+ex) create table 테이블명( id number primary key
+                                     ===========
+-----------------------------------------------------
+sql>alter table b_prtest add constraint b_prtest_pk_id primary key(id);
+
+sql>desc b_prtest
+
+ ID                                                 NUMBER
+ IRUM                                      NOT NULL VARCHAR2(10)
+
+SQL> alter table b_prtest add constraint b_prtest_pk_id primary key(id);
+
+테이블이 변경되었습니다.
+
+SQL> desc b_prtest
+ 이름                                      널?      유형
+ ----------------------------------------- -------- ----------------------
+
+ ID                                        NOT NULL NUMBER
+ IRUM                                      NOT NULL VARCHAR2(10)
+
+**********************************************
+sql>insert into b_prtest values(1,'홍길동');
+
+insert into b_prtest values(1,'홍길동')
+*
+1행에 오류:
+ORA-00001: 무결성 제약 조건(TEST1.B_PRTEST_PK_ID)에 위배됩니다
+                           계정명.제약조건이름
+
+->중복된 데이터는 입력시 에러유발->pk규칙을 위배했기때문에 발생하는
+  에러메세지
+
+*****************************************************
+                         공통점
+<문제7>unique 제약조건=> 중복되면 안되는 필드에 부여=>pk와 기능이 동일
+
+ 차이점
+==========
+ pk->not null+unique key같이 부여(중복X, 검색속도가 빠르다)
+ unique key->중복허용X에 부여 (not null 부여X)
+-------------------------------------------------------------
+
+ 테이블생성->pk(다른 테이블의 fk)와 연관,unique(현재 테이블에서만 사용)
+
+             중복을 허용하지 않으면서 다른 테이블의 필드와 연관이 있는
+             필드에 부여한다.
+
+형식) alter table 수정t add constraint 제약조건이름 종류(적용필드명)
+                                       uk           unique
+
+sql>alter table b_prtest add constraint b_prtest_uk_id unique(id);
+
+alter table b_prtest add constraint b_prtest_uk_id unique(id)
+                                                   *
+1행에 오류:
+ORA-02261: 고유 키 또는 기본 키가 이미 존재하고 있습니다
+
+->primary key를 부여하면 자동적으로 unique기능이 자동=>중복 설정 불가
+---------------------------------------------------------------------
+->alter table b_prtest add constraint b_prtest_uk_irum unique(irum);
+
+테이블이 변경되었습니다.
+
+SQL> desc b_prtest
+ 이름                                      널?      유형
+ ----------------------------------------- -------- -----------------------
+
+ ID                                        NOT NULL NUMBER
+ IRUM                                      NOT NULL VARCHAR2(10)
+
+<문제8>제약조건을 설정->더 이상 사용필요가 없다면 삭제
+형식)alter table 수정t명 drop constraint 삭제시킬 제약조건이름
+
+sql>alter table b_prtest drop constraint b_prtest_uk_irum;
+
+<문제9>check 제약조건=>데이터를 저장시킬때 올바른 값이 들어왔는지를 
+                       체크(숫자->범위를 지정,문자->특정한 값이 지정)
+
+sql>alter table b_prtest add (age number); //나이
+sql>alter table b_prtest add (addr varchar2(80));//주소
+
+ 형식) ~ 제약조건이름(ck) check(age >=20 and age <=65)
+                                  제약조건규칙=>자바의 캡슐화
+               직책=>check in ('사원','대리','과장','부장','이사')
+                                   적용된 직책만 입력을 허용
+------------------------------------------------------------------
+sql>alter table b_prtest add constraint b_prtest_ck_age 
+    check(age >=20 and age <=65);
+
+
+sql>insert into b_prtest values(2,'이길수',24,'서울시 강남구');
+
+1 개의 행이 만들어졌습니다.
+
+SQL> select * from b_prtest;
+
+        ID IRUM              AGE
+---------- ---------- ----------
+ADDR
+------------------------------------------
+
+         1 홍길동
+
+
+         2 이길수             24
+서울시 강남구
+
+sql>insert into b_prtest values(3,'테스트',78,'대전시 중구');
+
+SQL> insert into b_prtest values(3,'테스트',78,'대전시 중구');
+insert into b_prtest values(3,'테스트',78,'대전시 중구')
+*
+1행에 오류:
+ORA-02290: 체크 제약조건(TEST1.B_PRTEST_CK_AGE)이 위배되었습니다
+
+->check(age >=20 and age <=65) 허용되는 범위에 있지 않기때문에 에러유발
+=======================================================================
+<문제10> default(디폴트) 기능->값을 저장시킬때 문자->'저장할값',23 입력
+                               하지 않아도 자동적으로 지정한값이 존재하면
+                               입력을 시켜주는 기능
+
+  회원가입->가입날짜를 입력=>관리자->사이트분석=>언제 사이트(id,시간,,,)
+          =>관리자가 자동적으로 오늘날짜를 입력을 받을 수 있도록 처리
+======================================================================
+sql>alter table b_prtest add (hiredate date default sysdate);
+                                            -------
+                                            default '지정한값'
+
+SQL> desc b_prtest
+ 이름                                      널?      유형
+ ----------------------------------------- -------- -----------------
+
+ ID                                        NOT NULL NUMBER
+ IRUM                                      NOT NULL VARCHAR2(10)
+ AGE                                                NUMBER
+ ADDR                                               VARCHAR2(80)
+ HIREDATE                                           DATE
+
+SQL>
+=================================================================
+데이터를 입력 방법2가지
+
+->반드시 필드의 갯수에 맞게 데이터를 입력해야 된다.
+
+1)insert into 테이블명 values('문자값',,,,,);
+
+****************
+sql>insert into b_prtest values(3,'테스트2',34,'서울시 강남구');
+
+insert into b_prtest values(3,'테스트2',34,'서울시 강남구')
+            *
+1행에 오류:
+ORA-00947: 값의 수가 충분하지 않습니다 ->필드의 갯수 5개인데
+                                       ->입력한 갯수는 4개이기때문에 갯수가
+                                         부족하기때문에 발생되는 에러메세지
+***************************************
+sql>insert into b_prtest values(3,'테스트2',34,'서울','17/11/22');
+sql>insert into b_prtest values(4,'테스트3',34,'마산',sysdate);
+sql>insert into b_prtest values(5,'테스트4',23,'서울',default);
+
+ null을 허용해주는 필드->값을 입력하고 싶지 않은 경우->null을 쓰면된다.
+
+sql>insert into b_prtest values(6,'테스트5',null,null,null);
+
+1 개의 행이 만들어졌습니다.
+
+SQL> select * from b_prtest
+  2  where id=6;
+
+        ID IRUM              AGE
+---------- ---------- ----------
+ADDR
+---------------------------------------
+
+HIREDATE
+--------
+         6 테스트5
+
+------------------------------------------------------------------
+                        not null인 필드위주로 입력
+
+2) insert into 테이블명(필드명1,필드명2,,,)values(값1,값2,,,);
+
+  insert into b_prtest(id,irum,age) values(7,'테스트8',33);
+   ==>주소는 null이 들어가고 날짜는 default이 적용->오늘 날짜
+
+SQL> select * from b_prtest where id=7;
+
+        ID IRUM              AGE
+---------- ---------- ----------
+ADDR
+------------------------------------------------
+
+HIREDATE
+--------
+         7 테스트8            33
+
+17/11/22
+******************************************************
+제약조건->pk,uk,ck,default,not null =>하나의 테이블에 모두 설정이 가능
+         (기본키)
+
+        ->foreign key(외래키)->한 개이상의 테이블에서 서로 연결할때 사용
+                               하는 키(=참조키)
+                             =>자식테이블에서 값을 저장할때 필드와 연관
+                               부모테이블의 pk값을 참조(인증절차)해서
+                                있으면 값을 저장할 수 있도록 해주는 규칙
+                             =>참조 무결성 강화규칙
+----------------------------------------------------------------------
+  부서테이블
+
+  부모테이블<---------------------
+
+  데이터를 저장->테이블 생성=>테이블의 갯수(20개~)
+  하나의 테이블에 모든 데이터 저장이 가능=>필드수가 증가,레코드 증가
+                                         =>검색->속도 느려다  
+  테이블을 쪼개방법->정규화                          
+
+<문제 11> foreign key 설정방법
+
+sql> create table dept(deptno number primary key,
+                       dname varchar2(20) not null,
+                       loc varchar2(20) not null);
+
+     insert into dept values(10,'영업부','서울');
+     insert into dept values(20,'개발부','대전');
+     insert into dept values(30,'총무부','마산');
+
+ 개발부 2명 직원->sawon(신입사원)
+
+  연결시킬 필드명->반드시 같지 않아도 된다(보통은 같게 준다.)
+                   반드시 자료형은 같아야 된다.(varchar2<->varchar2)
+
+sql>create table sawon( id number primary key,
+                        name varchar2(20) not null,
+                        deptno number);//fk설정 누락
+
+ sql> insert into sawon values(1,'홍길동',20);
+      insert into sawon values(2,'임시',50);//엉터리 데이터가 존재
+
+SQL> select * from sawon;
+
+        ID NAME                     DEPTNO
+---------- -------------------- ----------
+         1 홍길동                       20
+         2 임시                         50 =>10~30번호로 변경->update
+                                             임시데이터를 삭제->delete
+---------------------------------------------------
+ 형식) alter table 수정t명 add constraint 관계설정할 이름 
+       foreign key(자기 테이블의 필드명) references 
+                   자식테이블
+       상대방테이블명(연결시킬 필드명(pk))
+       부모테이블  
+     
+sql>alter table sawon add constraint sawon_fk_deptno foreign key(deptno)
+    references dept(deptno);
+**********************************************
+alter table sawon add constraint sawon_fk_deptno foreign key(deptno)
+                                 *
+1행에 오류:
+ORA-02298: 제약 (TEST1.SAWON_FK_DEPTNO)을 사용 가능하게 할 수 없음 - 부모 키가
+없습니다
+
+=>규칙에 어긋나는 데이터가 이미 테이블에 존재하면 관계설정이 되지를 않는다
+  는 에러메세지
+*************************************************************************
+-------------------------------------------------------------------------
+
+        ID NAME                     DEPTNO
+---------- -------------------- ----------
+         1 홍길동                       20
+         2 임시                         50 =>10~30번호로 변경->update
+                                             임시데이터를 삭제->delete
+
+1) update sawon set deptno=20 where id=2;
+2) delete from sawon where id=2; ==>선택
+
+1 행이 삭제되었습니다.
+
+SQL> select * from sawon;
+
+        ID NAME                     DEPTNO
+---------- -------------------- ----------
+         1 홍길동                       20
+
+sql>SQL>  insert into sawon values(2,'임시',50);
+ insert into sawon values(2,'임시',50)
+*
+1행에 오류:
+ORA-02291: 무결성 제약조건(TEST1.SAWON_FK_DEPTNO)이 위배되었습니다- 부모 키가
+없습니다
+
+SQL>  insert into sawon values(2,'임시',20);
+
+1 개의 행이 만들어졌습니다.
+
+SQL> select * from sawon;
+
+        ID NAME                     DEPTNO
+---------- -------------------- ----------
+         1 홍길동                       20
+         2 임시                         20
+-----------------------------------------------------
+                   부모테이블(deptno)  <----- 자식테이블(deptno)
+                                   의존성
+
+<문제12>pk,check,foreign key=>설정됐는지 안됐는지 나중에 기억이 없다.
+        설정된 정보를 확인하는 방법?
+
+ 오라클=>모든 작업한 내용이 오라클에 전부 기록이 되어있다.
+       =>테이블에 저장이 된다.=>Data Dictionary(데이터 사전)
+
+ 오라클->시스템 테이블=>확인하는 방법
+         사용자 정의 테이블
+
+   제약조건 설정(add),삭제(drop)=>변경->제약조건의 불활성화<->활성화
+                                                      off       on
+  1)user_XXX->로그인한 계정(test1)들이 조회가 가능한 테이블
+  2)dba_xxx->관리자만 조회가 가능하다(select 일반유저 불가능)
+  3)all_xxx=>계정 O ,관리자도 O
+
+ =>user_constraints 시스템테이블에 저장
+
+sql>desc user_constraints
+----------------------------------------------------------------------
+ 이름                                      널?      유형
+ ----------------------------------------- -------- --------------------
+
+ OWNER                                              VARCHAR2(30)
+ CONSTRAINT_NAME(제약조건 이름) b_prtest_pk_id      NOT NULL VARCHAR2(30)
+ CONSTRAINT_TYPE(제약조건의 종류)                                    VARCHAR2(1)
+ TABLE_NAME(제약조건이 설정된 테이블 이름)                                NOT NULL VARCHAR2(30)
+ SEARCH_CONDITION                                   LONG
+ R_OWNER                                            VARCHAR2(30)
+ R_CONSTRAINT_NAME                                  VARCHAR2(30)
+ DELETE_RULE                                        VARCHAR2(9)
+ STATUS(제약조건 활성화상태)                        VARCHAR2(8)
+ DEFERRABLE                                         VARCHAR2(14)
+ DEFERRED                                           VARCHAR2(9)
+ VALIDATED                                          VARCHAR2(13)
+ GENERATED                                          VARCHAR2(14)
+ BAD                                                VARCHAR2(3)
+ RELY                                               VARCHAR2(4)
+ LAST_CHANGE                                        DATE
+ INDEX_OWNER                                        VARCHAR2(30)
+ INDEX_NAME                                         VARCHAR2(30)
+ INVALID                                            VARCHAR2(7)
+ VIEW_RELATED                                       VARCHAR2(14)
+
+SQL>select constraint_name,constraint_type,table_name,status
+    from user_constraints
+    where table_name=upper('&table_name');
+
+SQL> select constraint_name,constraint_type,table_name,status
+  2      from user_constraints
+  3      where table_name=upper('&table_name');
+table_name의 값을 입력하십시오: b_prtest
+구   3:     where table_name=upper('&table_name')
+신   3:     where table_name=upper('b_prtest')
+
+CONSTRAINT_NAME                C TABLE_NAME                     STATUS
+------------------------------ - ------------------------------ --------
+SYS_C0011055                   C B_PRTEST                       ENABLED
+B_PRTEST_PK_ID =>pk            P B_PRTEST                       ENABLED
+                                            ENABLED<->DISABLE
+B_PRTEST_CK_AGE                C B_PRTEST                       ENABLED
+
+SQL>
+table_name의 값을 입력하십시오: sawon
+구   3:     where table_name=upper('&table_name')
+신   3:     where table_name=upper('sawon')
+
+CONSTRAINT_NAME                C TABLE_NAME                     STATUS
+------------------------------ - ------------------------------ --------
+SYS_C0011062                   C SAWON                          ENABLED
+SYS_C0011063                   P SAWON                          ENABLED
+SAWON_FK_DEPTNO                R SAWON                          ENABLED
+
+  
+ create table sawon ( id number primary key =>SYS_C0011063 
+ create table sawon ( id number constraint sawon_pk_id primary key
+============================================================
+sql>save c:\webtest\2.db\print\consearch.txt -->@~
+
+<문제13>제약조건이 활성화부분==>임시로 지금 불활성화 시키자(작동 중지)
+                          drop constraints
+                         add constraints
+형식)alter table 수정t disable constraints 비활성화시킬 제약조건 이름
+
+sql>alter table b_prtest disable constraints b_prtest_ck_age;
+  ===>user_constraints (status->disabled
+
+sql>@c:\webtest\2.db\print\consearch.txt
+
+table_name의 값을 입력하십시오: b_prtest
+구   3:     where table_name=upper('&table_name')
+신   3:     where table_name=upper('b_prtest')
+
+CONSTRAINT_NAME                C TABLE_NAME                     STATUS
+------------------------------ - ------------------------------ --------
+SYS_C0011055                   C B_PRTEST                       ENABLED
+B_PRTEST_PK_ID                 P B_PRTEST                       ENABLED
+B_PRTEST_CK_AGE                C B_PRTEST                       DISABLED
+                                                                =======
+SQL> 7번데이터까지 입력한 상태
+sql> insert into b_prtest values(8,'임시2',90,null,null);
+1 개의 행이 만들어졌습니다.
+
+---->이미 엉터리값이 들어간 상태=>enabled이 작동이 안된다.
+
+sql>update b_prtest set age=32 where id=8;
+
+<문제14>제약조건이 불활성화->활성화시켜주는 방법
+--------------------------------------------------
+형식)alter table 수정t enable constraints 활성화시킬 제약조건 이름
+
+sql>alter table b_prtest enable constraints b_prtest_ck_age;
+
+sql>insert into b_prtest values(9,'임시3',100,null,null);
+
+SQL> insert into b_prtest values(9,'임시3',100,null,null);
+insert into b_prtest values(9,'임시3',100,null,null)
+*
+1행에 오류:
+ORA-02290: 체크 제약조건(TEST1.B_PRTEST_CK_AGE)이 위배되었습니다
+
+ DDL,제약조건->조인
+
+*****************************
+해당 칼럼에 자료가 없는 경우
+칼럼의 데이터 타입을 변경할 수 있다.
+칼럼의 크기를 변경할 수 있다.
+
+ 해당 칼럼에 자료가 있는 경우
+칼럼의 데이터 타입을 변경할 수 없다.
+크기를 늘릴 수는 있지만 현재 가지고 있는 데이터 크기보다 작은 크기로 변경할 수 없다.
+************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

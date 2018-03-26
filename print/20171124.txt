@@ -1,0 +1,674 @@
+SQL> select dname,count(empno) "인원수"
+  2  from emp,dept
+  3  where emp.deptno=dept.deptno
+  4  group by dept.dname
+  5  having count(empno)>=5;
+
+DNAME              인원수                                                       
+-------------- ----------                                                       
+RESEARCH                5                                                       
+SALES                   6                                                       
+
+SQL> select e.ename,d.dname,d.deptno
+  2      from emp e,dept d
+  3      where e.deptno(+)=d.deptno;
+
+ENAME      DNAME              DEPTNO                                            
+---------- -------------- ----------                                            
+SMITH      RESEARCH               20                                            
+ALLEN      SALES                  30                                            
+WARD       SALES                  30                                            
+JONES      RESEARCH               20                                            
+MARTIN     SALES                  30                                            
+BLAKE      SALES                  30                                            
+CLARK      ACCOUNTING             10                                            
+SCOTT      RESEARCH               20                                            
+KING       ACCOUNTING             10                                            
+TURNER     SALES                  30                                            
+ADAMS      RESEARCH               20                                            
+
+ENAME      DNAME              DEPTNO                                            
+---------- -------------- ----------                                            
+JAMES      SALES                  30                                            
+FORD       RESEARCH               20                                            
+MILLER     ACCOUNTING             10                                            
+           OPERATIONS             40                                            
+
+15 개의 행이 선택되었습니다.
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select e.ename,d.dname,d.deptno
+  2      from emp e,dept d
+  3*     where e.deptno(+)=d.deptno and e.ename is null
+SQL> /
+
+ENAME      DNAME              DEPTNO                                            
+---------- -------------- ----------                                            
+           OPERATIONS             40                                            
+
+SQL> select job from emp where empno=7521;
+
+JOB                                                                             
+---------                                                                       
+SALESMAN                                                                        
+
+SQL> select sal from emp where empno=7934;
+
+       SAL                                                                      
+----------                                                                      
+      1300                                                                      
+
+SQL> select empno,ename,job,sal from emp
+  2    where job='SALESMAN' and sal > 1300;
+
+     EMPNO ENAME      JOB              SAL                                      
+---------- ---------- --------- ----------                                      
+      7499 ALLEN      SALESMAN        1600                                      
+      7844 TURNER     SALESMAN        1500                                      
+
+SQL> select empno,ename,job,sal from emp
+  2    where job=(select job from emp where empno=7521) and
+  3          sal > (select sal from emp where empno=7934);
+
+     EMPNO ENAME      JOB              SAL                                      
+---------- ---------- --------- ----------                                      
+      7499 ALLEN      SALESMAN        1600                                      
+      7844 TURNER     SALESMAN        1500                                      
+
+SQL> select avg(sal) from emp;
+
+  AVG(SAL)                                                                      
+----------                                                                      
+2073.21429                                                                      
+
+SQL> select ename,job,sal from emp
+  2    where sal < 2073.21429;
+
+ENAME      JOB              SAL                                                 
+---------- --------- ----------                                                 
+SMITH      CLERK            800                                                 
+ALLEN      SALESMAN        1600                                                 
+WARD       SALESMAN        1250                                                 
+MARTIN     SALESMAN        1250                                                 
+TURNER     SALESMAN        1500                                                 
+ADAMS      CLERK           1100                                                 
+JAMES      CLERK            950                                                 
+MILLER     CLERK           1300                                                 
+
+8 개의 행이 선택되었습니다.
+
+SQL> select min(sal) from emp
+  2    where deptno=20;
+
+  MIN(SAL)                                                                      
+----------                                                                      
+       800                                                                      
+
+SQL> select deptno,min(sal)
+  2    from emp
+  3    group by deptno;
+
+    DEPTNO   MIN(SAL)                                                           
+---------- ----------                                                           
+        30        950                                                           
+        20        800                                                           
+        10       1300                                                           
+
+SQL> select deptno,min(sal)
+  2    from emp
+  3    group by deptno
+  4    having min(sal) > 800;
+
+    DEPTNO   MIN(SAL)                                                           
+---------- ----------                                                           
+        30        950                                                           
+        10       1300                                                           
+
+SQL> select deptno,min(sal)
+  2    from emp
+  3    group by deptno
+  4    having min(sal) > (select min(sal) from emp
+  5                        where deptno=20);
+
+    DEPTNO   MIN(SAL)                                                           
+---------- ----------                                                           
+        30        950                                                           
+        10       1300                                                           
+
+SQL> clear screen
+
+SQL> select min(sal) from emp
+  2    group by deptno;
+
+  MIN(SAL)                                                                      
+----------                                                                      
+       950                                                                      
+       800                                                                      
+      1300                                                                      
+
+SQL> select ename,job,sal,deptno
+  2      from emp
+  3      where sal=(select min(sal) from emp
+  4                 group by deptno);
+    where sal=(select min(sal) from emp
+               *
+3행에 오류:
+ORA-01427: 단일 행 하위 질의에 2개 이상의 행이 리턴되었습니다. 
+
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select ename,job,sal,deptno
+  2      from emp
+  3      where sal in (select min(sal) from emp
+  4*                group by deptno)
+SQL> /
+
+ENAME      JOB              SAL     DEPTNO                                      
+---------- --------- ---------- ----------                                      
+SMITH      CLERK            800         20                                      
+JAMES      CLERK            950         30                                      
+MILLER     CLERK           1300         10                                      
+
+SQL> 
+SQL> select min(sal) from emp where deptno=30;
+
+  MIN(SAL)                                                                      
+----------                                                                      
+       950                                                                      
+
+SQL> select ename,job,deptno from emp
+  2    where deptno!=30 and sal > 950;
+
+ENAME      JOB           DEPTNO                                                 
+---------- --------- ----------                                                 
+JONES      MANAGER           20                                                 
+CLARK      MANAGER           10                                                 
+SCOTT      ANALYST           20                                                 
+KING       PRESIDENT         10                                                 
+ADAMS      CLERK             20                                                 
+FORD       ANALYST           20                                                 
+MILLER     CLERK             10                                                 
+
+7 개의 행이 선택되었습니다.
+
+SQL> select ename,job,sal,deptno from emp
+  2    where deptno!=30 and sal > (select min(sal) from emp
+  3                                where deptno=30);
+
+ENAME      JOB              SAL     DEPTNO                                      
+---------- --------- ---------- ----------                                      
+JONES      MANAGER         2975         20                                      
+CLARK      MANAGER         2450         10                                      
+SCOTT      ANALYST         3000         20                                      
+KING       PRESIDENT       5000         10                                      
+ADAMS      CLERK           1100         20                                      
+FORD       ANALYST         3000         20                                      
+MILLER     CLERK           1300         10                                      
+
+7 개의 행이 선택되었습니다.
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select ename,job,sal,deptno from emp
+  2    where deptno!=30 and sal > any(select sal from emp
+  3*                               where deptno=30)
+SQL> /
+
+ENAME      JOB              SAL     DEPTNO                                      
+---------- --------- ---------- ----------                                      
+KING       PRESIDENT       5000         10                                      
+SCOTT      ANALYST         3000         20                                      
+FORD       ANALYST         3000         20                                      
+JONES      MANAGER         2975         20                                      
+CLARK      MANAGER         2450         10                                      
+MILLER     CLERK           1300         10                                      
+ADAMS      CLERK           1100         20                                      
+
+7 개의 행이 선택되었습니다.
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select ename,job,sal,deptno from emp
+  2    where deptno!=30 and sal < (select max(sal) from emp
+  3*                               where deptno=30)
+SQL> /
+
+ENAME      JOB              SAL     DEPTNO                                      
+---------- --------- ---------- ----------                                      
+SMITH      CLERK            800         20                                      
+CLARK      MANAGER         2450         10                                      
+ADAMS      CLERK           1100         20                                      
+MILLER     CLERK           1300         10                                      
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select ename,job,sal,deptno from emp
+  2    where deptno!=30 and sal < any(select sal from emp
+  3*                               where deptno=30)
+SQL> /
+
+ENAME      JOB              SAL     DEPTNO                                      
+---------- --------- ---------- ----------                                      
+SMITH      CLERK            800         20                                      
+ADAMS      CLERK           1100         20                                      
+MILLER     CLERK           1300         10                                      
+CLARK      MANAGER         2450         10                                      
+
+SQL> select * from emp where empno=mgr;
+
+선택된 레코드가 없습니다.
+
+SQL> select empno,ename,job
+  2     from emp e
+  3     where exists (select * from emp where e.empno=mgr);
+
+     EMPNO ENAME      JOB                                                       
+---------- ---------- ---------                                                 
+      7902 FORD       ANALYST                                                   
+      7698 BLAKE      MANAGER                                                   
+      7839 KING       PRESIDENT                                                 
+      7566 JONES      MANAGER                                                   
+      7788 SCOTT      ANALYST                                                   
+      7782 CLARK      MANAGER                                                   
+
+6 개의 행이 선택되었습니다.
+
+SQL> select * from emp where e.empno=mgr;
+select * from emp where e.empno=mgr
+                        *
+1행에 오류:
+ORA-00904: "E"."EMPNO": 부적합한 식별자 
+
+
+SQL> select e.ename,e.job,d.dname,d.loc
+  2      from emp e,dept d
+  3      where e.deptno=d.deptno and e.job='MANAGER';
+
+ENAME      JOB       DNAME          LOC                                         
+---------- --------- -------------- -------------                               
+JONES      MANAGER   RESEARCH       DALLAS                                      
+BLAKE      MANAGER   SALES          CHICAGO                                     
+CLARK      MANAGER   ACCOUNTING     NEW YORK                                    
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select e.ename,e.job,d.dname,d.loc
+  2      from (
+  3         select ename,job,deptno
+  4         from emp
+  5         where job='MANAGER'
+  6       ) e,dept d
+  7*     where e.deptno=d.deptno
+SQL> /
+
+ENAME      JOB       DNAME          LOC                                         
+---------- --------- -------------- -------------                               
+JONES      MANAGER   RESEARCH       DALLAS                                      
+BLAKE      MANAGER   SALES          CHICAGO                                     
+CLARK      MANAGER   ACCOUNTING     NEW YORK                                    
+
+SQL> select deptno from dept
+  2    where loc='NEW YORK';
+
+    DEPTNO                                                                      
+----------                                                                      
+        10                                                                      
+
+SQL> select deptno,dname,(
+  2       case when deptno in (select deptno from dept
+  3                            where loc='NEW YORK')
+  4          then 'Center'
+  5         else 'Assist'
+  6       end
+  7      ) "부서 위치"
+  8     from dept;
+
+    DEPTNO DNAME          부서                                                  
+---------- -------------- ------                                                
+        10 ACCOUNTING     Center                                                
+        20 RESEARCH       Assist                                                
+        30 SALES          Assist                                                
+        40 OPERATIONS     Assist                                                
+
+SQL> select deptno,count(*),avg(sal),sum(sal),min(sal),max(sal)
+  2    from emp
+  3    group by deptno;
+
+    DEPTNO   COUNT(*)   AVG(SAL)   SUM(SAL)   MIN(SAL)   MAX(SAL)               
+---------- ---------- ---------- ---------- ---------- ----------               
+        30          6 1566.66667       9400        950       2850               
+        20          5       2175      10875        800       3000               
+        10          3 2916.66667       8750       1300       5000               
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  create table emp_deptno
+  2  as
+  3  select deptno,count(*),avg(sal),sum(sal),min(sal),max(sal)
+  4    from emp
+  5*   group by deptno
+  6  /
+select deptno,count(*),avg(sal),sum(sal),min(sal),max(sal)
+              *
+3행에 오류:
+ORA-00998: 이 식은 열의 별명과 함께 지정해야 합니다 
+
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  create table emp_deptno(deptno,e_count,e_avg,e_sum,e_min,e_max)
+  2  as
+  3  select deptno,count(*),avg(sal),sum(sal),min(sal),max(sal)
+  4    from emp
+  5*   group by deptno
+SQL> /
+
+테이블이 생성되었습니다.
+
+SQL> select * from emp_deptno;
+
+    DEPTNO    E_COUNT      E_AVG      E_SUM      E_MIN      E_MAX               
+---------- ---------- ---------- ---------- ---------- ----------               
+        30          6 1566.66667       9400        950       2850               
+        20          5       2175      10875        800       3000               
+        10          3 2916.66667       8750       1300       5000               
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+BONUS                          TABLE                                            
+B_EMP                          TABLE                                            
+B_ENAME                        TABLE                                            
+DEPT                           TABLE                                            
+EMP                            TABLE                                            
+EMP_DEPTNO                     TABLE                                            
+SALGRADE                       TABLE                                            
+ZIPCODE                        TABLE                                            
+
+8 개의 행이 선택되었습니다.
+
+SQL> insert into (
+  2                   select empno,ename,sal,hiredate,job,deptno
+  3                   from b_emp where deptno=40
+  4                   ) values (7777,'JANG",4000,
+  5                   to_date('17-11-24','rr-mm-dd'),'MANAGER',40);
+ERROR:
+ORA-01756: 단일 인용부를 지정해 주십시오 
+
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  insert into (
+  2                   select empno,ename,sal,hiredate,job,deptno
+  3                   from b_emp where deptno=40
+  4                   ) values (7777,'JANG',4000,
+  5*                  to_date('17-11-24','rr-mm-dd'),'MANAGER',40)
+SQL> /
+
+1 개의 행이 만들어졌습니다.
+
+SQL> select * from b_emp where deptno=40;
+
+     EMPNO ENAME      JOB              MGR HIREDATE        SAL       COMM       
+---------- ---------- --------- ---------- -------- ---------- ----------       
+    DEPTNO                                                                      
+----------                                                                      
+      7777 JANG       MANAGER              17/11/24       4000                  
+        40                                                                      
+                                                                                
+
+SQL>  select job,sal from emp
+  2   where ename=upper('&ename');
+ename의 값을 입력하십시오: scott
+구   2:  where ename=upper('&ename')
+신   2:  where ename=upper('scott')
+
+JOB              SAL                                                            
+--------- ----------                                                            
+ANALYST         3000                                                            
+
+SQL> /
+ename의 값을 입력하십시오: jones
+구   2:  where ename=upper('&ename')
+신   2:  where ename=upper('jones')
+
+JOB              SAL                                                            
+--------- ----------                                                            
+MANAGER         2975                                                            
+
+SQL> update b_emp
+  2              set (job,sal)=(select job,sal from b_emp
+  3                             where ename='SCOTT')
+  4     where ename='JONES';
+
+1 행이 갱신되었습니다.
+
+SQL> select job,sal from b_emp where ename='JONES';
+
+JOB              SAL                                                            
+--------- ----------                                                            
+ANALYST         3000                                                            
+
+SQL> select deptno from dept where dname='SALES';
+
+    DEPTNO                                                                      
+----------                                                                      
+        30                                                                      
+
+SQL> delete from b_emp where deptno=(select deptno from dept
+  2                                        where dname='SALES');
+
+6 행이 삭제되었습니다.
+
+SQL> select count(*) from b_emp;
+
+  COUNT(*)                                                                      
+----------                                                                      
+         9                                                                      
+
+SQL> rollback;
+
+롤백이 완료되었습니다.
+
+SQL> select count(*) from b_emp;
+
+  COUNT(*)                                                                      
+----------                                                                      
+        14                                                                      
+
+SQL> create table dept_sales
+  2           as select * from dept where 1=2;
+
+테이블이 생성되었습니다.
+
+SQL> select count(*) from dept_sales;
+
+  COUNT(*)                                                                      
+----------                                                                      
+         0                                                                      
+
+SQL> insert into dept_sales
+  2       select deptno,dname,loc from dept
+  3       where dname='SALES';
+
+1 개의 행이 만들어졌습니다.
+
+SQL> select * from dept_sales;
+
+    DEPTNO DNAME          LOC                                                   
+---------- -------------- -------------                                         
+        30 SALES          CHICAGO                                               
+
+SQL> select empno,ename from emp
+  2  where job='MANAGER';
+
+     EMPNO ENAME                                                                
+---------- ----------                                                           
+      7566 JONES                                                                
+      7698 BLAKE                                                                
+      7782 CLARK                                                                
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,ename from emp
+  2  where job='MANAGER'
+  3  union
+  4  select empno,ename from emp
+  5* where ename like 'A%'
+SQL> /
+
+     EMPNO ENAME                                                                
+---------- ----------                                                           
+      7499 ALLEN                                                                
+      7566 JONES                                                                
+      7698 BLAKE                                                                
+      7782 CLARK                                                                
+      7876 ADAMS                                                                
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,ename from emp
+  2  where job='MANAGER'
+  3  minus
+  4  select empno,ename from emp
+  5* where ename like 'A%'
+SQL> /
+
+     EMPNO ENAME                                                                
+---------- ----------                                                           
+      7566 JONES                                                                
+      7698 BLAKE                                                                
+      7782 CLARK                                                                
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,ename from emp
+  2  where job='MANAGER'
+  3  union all
+  4  select empno,ename from emp
+  5* where ename like 'A%'
+SQL> /
+
+     EMPNO ENAME                                                                
+---------- ----------                                                           
+      7566 JONES                                                                
+      7698 BLAKE                                                                
+      7782 CLARK                                                                
+      7499 ALLEN                                                                
+      7876 ADAMS                                                                
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,job from emp
+  2  where job='MANAGER'
+  3  union all
+  4  select empno,ename from emp
+  5* where ename like 'A%'
+SQL> /
+
+     EMPNO JOB                                                                  
+---------- ----------                                                           
+      7566 MANAGER                                                              
+      7698 MANAGER                                                              
+      7782 MANAGER                                                              
+      7499 ALLEN                                                                
+      7876 ADAMS                                                                
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,sal from emp
+  2  where job='MANAGER'
+  3  union all
+  4  select empno,ename from emp
+  5* where ename like 'A%'
+SQL> /
+select empno,sal from emp
+             *
+1행에 오류:
+ORA-01790: 대응하는 식과 같은 데이터 유형이어야 합니다 
+
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,job,sal from emp
+  2  where job='MANAGER'
+  3  union all
+  4  select empno,ename from emp
+  5* where ename like 'A%'
+SQL> /
+select empno,job,sal from emp
+*
+1행에 오류:
+ORA-01789: 질의 블록은 부정확한 수의 결과 열을 가지고 있습니다. 
+
+
+SQL> create view v_emp20
+  2      as select empno,ename,job,deptno from b_emp
+  3      where deptno=20;
+create view v_emp20
+            *
+1행에 오류:
+ORA-01031: 권한이 불충분합니다 
+
+
+SQL> conn sys/sys12345 as sysdba
+연결되었습니다.
+SQL> grant create view,create synonym to test1,scott;
+
+권한이 부여되었습니다.
+
+SQL> conn test1/t1234
+연결되었습니다.
+SQL> create view v_emp20
+  2          as select empno,ename,job,deptno from b_emp
+  3         where deptno=20;
+        as select empno,ename,job,deptno from b_emp
+                                              *
+2행에 오류:
+ORA-00942: 테이블 또는 뷰가 존재하지 않습니다 
+
+
+SQL> select * from b_emp;
+select * from b_emp
+              *
+1행에 오류:
+ORA-00942: 테이블 또는 뷰가 존재하지 않습니다 
+
+
+SQL> conn scott/tiger
+연결되었습니다.
+SQL> create view v_emp20
+  2          as select empno,ename,job,deptno from b_emp
+  3         where deptno=20;
+
+뷰가 생성되었습니다.
+
+SQL> select * from v_emp20;
+
+     EMPNO ENAME      JOB           DEPTNO                                      
+---------- ---------- --------- ----------                                      
+      7369 SMITH      CLERK             20                                      
+      7566 JONES      MANAGER           20                                      
+      7788 SCOTT      ANALYST           20                                      
+      7876 ADAMS      CLERK             20                                      
+      7902 FORD       ANALYST           20                                      
+
+SQL> spool off

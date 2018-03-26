@@ -1,0 +1,642 @@
+SQL> select sal,sal*12 as 연봉
+  2  from emp
+  3  where empno=7782 or empno=7788 or empno=7844;
+
+       SAL       연봉                                                           
+---------- ----------                                                           
+      2450      29400                                                           
+      3000      36000                                                           
+      1500      18000                                                           
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,ename,sal,sal*12 as 연봉
+  2  from emp
+  3* where empno in (7782,7788,7844)
+SQL> /
+
+     EMPNO ENAME             SAL       연봉                                     
+---------- ---------- ---------- ----------                                     
+      7782 CLARK            2450      29400                                     
+      7788 SCOTT            3000      36000                                     
+      7844 TURNER           1500      18000                                     
+
+SQL> select empno,ename,job,sal
+  2  from emp
+  3  where job='SALESMAN' or job='PRESIDENT and sal >=1500;
+ERROR:
+ORA-01756: 단일 인용부를 지정해 주십시오 
+
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,ename,job,sal
+  2  from emp
+  3* where job='SALESMAN' or job='PRESIDENT' and sal >=1500
+SQL> /
+
+     EMPNO ENAME      JOB              SAL                                      
+---------- ---------- --------- ----------                                      
+      7499 ALLEN      SALESMAN        1600                                      
+      7521 WARD       SALESMAN        1250                                      
+      7654 MARTIN     SALESMAN        1250                                      
+      7839 KING       PRESIDENT       5000                                      
+      7844 TURNER     SALESMAN        1500                                      
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,ename,job,sal
+  2  from emp
+  3* where (job='SALESMAN' or job='PRESIDENT') and sal >=1500
+SQL> /
+
+     EMPNO ENAME      JOB              SAL                                      
+---------- ---------- --------- ----------                                      
+      7499 ALLEN      SALESMAN        1600                                      
+      7839 KING       PRESIDENT       5000                                      
+      7844 TURNER     SALESMAN        1500                                      
+
+SQL> select empno,ename,sal from emp
+  2      where sal not between 2000 and 3000;
+
+     EMPNO ENAME             SAL                                                
+---------- ---------- ----------                                                
+      7369 SMITH             800                                                
+      7499 ALLEN            1600                                                
+      7521 WARD             1250                                                
+      7654 MARTIN           1250                                                
+      7839 KING             5000                                                
+      7844 TURNER           1500                                                
+      7876 ADAMS            1100                                                
+      7900 JAMES             950                                                
+      7934 MILLER           1300                                                
+
+9 개의 행이 선택되었습니다.
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,ename,sal from emp
+  2  where sal not between 2000 and 3000
+  3* order by sal desc
+  4  ;
+
+     EMPNO ENAME             SAL                                                
+---------- ---------- ----------                                                
+      7839 KING             5000                                                
+      7499 ALLEN            1600                                                
+      7844 TURNER           1500                                                
+      7934 MILLER           1300                                                
+      7521 WARD             1250                                                
+      7654 MARTIN           1250                                                
+      7876 ADAMS            1100                                                
+      7900 JAMES             950                                                
+      7369 SMITH             800                                                
+
+9 개의 행이 선택되었습니다.
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,ename,sal from emp
+  2  where sal not between 2000 and 3000
+  3* order by 3 desc
+  4  ;
+
+     EMPNO ENAME             SAL                                                
+---------- ---------- ----------                                                
+      7839 KING             5000                                                
+      7499 ALLEN            1600                                                
+      7844 TURNER           1500                                                
+      7934 MILLER           1300                                                
+      7521 WARD             1250                                                
+      7654 MARTIN           1250                                                
+      7876 ADAMS            1100                                                
+      7900 JAMES             950                                                
+      7369 SMITH             800                                                
+
+9 개의 행이 선택되었습니다.
+
+SQL> select ename as 사원명,sal 급여,sal*12 연봉
+  2      from emp
+  3      order by 연봉 desc,ename asc;
+
+사원명           급여       연봉                                                
+---------- ---------- ----------                                                
+KING             5000      60000                                                
+FORD             3000      36000                                                
+SCOTT            3000      36000                                                
+JONES            2975      35700                                                
+BLAKE            2850      34200                                                
+CLARK            2450      29400                                                
+ALLEN            1600      19200                                                
+TURNER           1500      18000                                                
+MILLER           1300      15600                                                
+MARTIN           1250      15000                                                
+WARD             1250      15000                                                
+
+사원명           급여       연봉                                                
+---------- ---------- ----------                                                
+ADAMS            1100      13200                                                
+JAMES             950      11400                                                
+SMITH             800       9600                                                
+
+14 개의 행이 선택되었습니다.
+
+SQL> select * from dept;
+
+    DEPTNO DNAME          LOC                                                   
+---------- -------------- -------------                                         
+        10 ACCOUNTING     NEW YORK                                              
+        20 RESEARCH       DALLAS                                                
+        30 SALES          CHICAGO                                               
+        40 OPERATIONS     BOSTON                                                
+
+SQL> select ename,sal,deptno
+  2  from emp
+  3  where deptno=10
+  4  order by 2 desc;
+
+ENAME             SAL     DEPTNO                                                
+---------- ---------- ----------                                                
+KING             5000         10                                                
+CLARK            2450         10                                                
+MILLER           1300         10                                                
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select ename,job,sal,deptno
+  2  from emp
+  3  where deptno=20
+  4* order by 2 desc
+SQL> /
+
+ENAME      JOB              SAL     DEPTNO                                      
+---------- --------- ---------- ----------                                      
+JONES      MANAGER         2975         20                                      
+ADAMS      CLERK           1100         20                                      
+SMITH      CLERK            800         20                                      
+FORD       ANALYST         3000         20                                      
+SCOTT      ANALYST         3000         20                                      
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select ename,job,sal,deptno
+  2  from emp
+  3  where deptno=20
+  4* order by 3 desc
+SQL> /
+
+ENAME      JOB              SAL     DEPTNO                                      
+---------- --------- ---------- ----------                                      
+SCOTT      ANALYST         3000         20                                      
+FORD       ANALYST         3000         20                                      
+JONES      MANAGER         2975         20                                      
+ADAMS      CLERK           1100         20                                      
+SMITH      CLERK            800         20                                      
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select ename,job,sal,deptno
+  2  from emp
+  3  where deptno=&deptno
+  4* order by 3 desc
+SQL> /
+deptno의 값을 입력하십시오: 30
+구   3: where deptno=&deptno
+신   3: where deptno=30
+
+ENAME      JOB              SAL     DEPTNO                                      
+---------- --------- ---------- ----------                                      
+BLAKE      MANAGER         2850         30                                      
+ALLEN      SALESMAN        1600         30                                      
+TURNER     SALESMAN        1500         30                                      
+WARD       SALESMAN        1250         30                                      
+MARTIN     SALESMAN        1250         30                                      
+JAMES      CLERK            950         30                                      
+
+6 개의 행이 선택되었습니다.
+
+SQL> /
+deptno의 값을 입력하십시오: 10
+구   3: where deptno=&deptno
+신   3: where deptno=10
+
+ENAME      JOB              SAL     DEPTNO                                      
+---------- --------- ---------- ----------                                      
+KING       PRESIDENT       5000         10                                      
+CLARK      MANAGER         2450         10                                      
+MILLER     CLERK           1300         10                                      
+
+SQL> /
+deptno의 값을 입력하십시오: 40
+구   3: where deptno=&deptno
+신   3: where deptno=40
+
+선택된 레코드가 없습니다.
+
+SQL> clear screen
+
+SQL> 
+SQL> save C:\webtest\2.db\print\deptnosearch.txt
+file C:\webtest\2.db\print\deptnosearch.txt(이)가 생성되었습니다
+SQL> @C:\webtest\2.db\print\deptnosearch.txt
+deptno의 값을 입력하십시오: 20
+구   3: where deptno=&deptno
+신   3: where deptno=20
+
+ENAME      JOB              SAL     DEPTNO                                      
+---------- --------- ---------- ----------                                      
+SCOTT      ANALYST         3000         20                                      
+FORD       ANALYST         3000         20                                      
+JONES      MANAGER         2975         20                                      
+ADAMS      CLERK           1100         20                                      
+SMITH      CLERK            800         20                                      
+
+SQL> select empno,ename,sal from emp
+  2      where ename='SCOTT';
+
+     EMPNO ENAME             SAL                                                
+---------- ---------- ----------                                                
+      7788 SCOTT            3000                                                
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,ename,sal from emp
+  2*     where ename=&ename
+SQL> /
+ename의 값을 입력하십시오: ALLEN
+구   2:     where ename=&ename
+신   2:     where ename=ALLEN
+    where ename=ALLEN
+                *
+2행에 오류:
+ORA-00904: "ALLEN": 부적합한 식별자 
+
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,ename,sal from emp
+  2*     where ename='&ename'
+SQL> /
+ename의 값을 입력하십시오: ALLEN
+구   2:     where ename='&ename'
+신   2:     where ename='ALLEN'
+
+     EMPNO ENAME             SAL                                                
+---------- ---------- ----------                                                
+      7499 ALLEN            1600                                                
+
+SQL> /
+ename의 값을 입력하십시오: KING
+구   2:     where ename='&ename'
+신   2:     where ename='KING'
+
+     EMPNO ENAME             SAL                                                
+---------- ---------- ----------                                                
+      7839 KING             5000                                                
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+BONUS                          TABLE                                            
+DEPT                           TABLE                                            
+EMP                            TABLE                                            
+SALGRADE                       TABLE                                            
+ZIPCODE                        TABLE                                            
+
+SQL> create table b_emp
+  2       as select * from emp;
+
+테이블이 생성되었습니다.
+
+SQL> select count(*) from b_emp;
+
+  COUNT(*)                                                                      
+----------                                                                      
+        14                                                                      
+
+SQL> create table b_ename
+  2      as select ename,job from emp
+  3      where ename like '_D%';
+
+테이블이 생성되었습니다.
+
+SQL> select * from b_ename;
+
+ENAME      JOB                                                                  
+---------- ---------                                                            
+ADAMS      CLERK                                                                
+
+SQL>     where ename='SCOTT';
+SP2-0734: "where enam..."(으)로 시작되는 알 수 없는 명령 - 나머지 줄은 무시되었습니다.
+SQL> select empno,ename,sal from emp
+  2         where ename='&ename';
+ename의 값을 입력하십시오: ALLEN
+구   2:        where ename='&ename'
+신   2:        where ename='ALLEN'
+
+     EMPNO ENAME             SAL                                                
+---------- ---------- ----------                                                
+      7499 ALLEN            1600                                                
+
+SQL> /
+ename의 값을 입력하십시오: allen
+구   2:        where ename='&ename'
+신   2:        where ename='allen'
+
+선택된 레코드가 없습니다.
+
+SQL> save c:\webtest\2.db\print\namesearch.txt
+file c:\webtest\2.db\print\namesearch.txt(이)가 생성되었습니다
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+BONUS                          TABLE                                            
+B_EMP                          TABLE                                            
+B_ENAME                        TABLE                                            
+DEPT                           TABLE                                            
+EMP                            TABLE                                            
+SALGRADE                       TABLE                                            
+ZIPCODE                        TABLE                                            
+
+7 개의 행이 선택되었습니다.
+
+SQL> desc dual
+ 이름                                      널?      유형
+ ----------------------------------------- -------- ----------------------------
+ DUMMY                                              VARCHAR2(1)
+
+SQL> select sysdate,ename from emp;
+
+SYSDATE  ENAME                                                                  
+-------- ----------                                                             
+17/11/20 SMITH                                                                  
+17/11/20 ALLEN                                                                  
+17/11/20 WARD                                                                   
+17/11/20 JONES                                                                  
+17/11/20 MARTIN                                                                 
+17/11/20 BLAKE                                                                  
+17/11/20 CLARK                                                                  
+17/11/20 SCOTT                                                                  
+17/11/20 KING                                                                   
+17/11/20 TURNER                                                                 
+17/11/20 ADAMS                                                                  
+
+SYSDATE  ENAME                                                                  
+-------- ----------                                                             
+17/11/20 JAMES                                                                  
+17/11/20 FORD                                                                   
+17/11/20 MILLER                                                                 
+
+14 개의 행이 선택되었습니다.
+
+SQL> select sysdate from dual;
+
+SYSDATE                                                                         
+--------                                                                        
+17/11/20                                                                        
+
+SQL> select 20*45 from dual;
+
+     20*45                                                                      
+----------                                                                      
+       900                                                                      
+
+SQL> @c:\webtest\2.db\print\namesearch.txt
+ename의 값을 입력하십시오: allen
+구   2:        where ename='&ename'
+신   2:        where ename='allen'
+
+선택된 레코드가 없습니다.
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,ename,sal from emp
+  2*        where ename=upper('&ename')
+SQL> /
+ename의 값을 입력하십시오: allen
+구   2:        where ename=upper('&ename')
+신   2:        where ename=upper('allen')
+
+     EMPNO ENAME             SAL                                                
+---------- ---------- ----------                                                
+      7499 ALLEN            1600                                                
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,lower(ename),sal from emp
+  2*        where ename=upper('&ename')
+SQL> /
+ename의 값을 입력하십시오: king
+구   2:        where ename=upper('&ename')
+신   2:        where ename=upper('king')
+
+     EMPNO LOWER(ENAM        SAL                                                
+---------- ---------- ----------                                                
+      7839 king             5000                                                
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select empno,lower(ename),sal from emp
+  2*        where lower(ename)='&ename'
+SQL> /
+ename의 값을 입력하십시오: king
+구   2:        where lower(ename)='&ename'
+신   2:        where lower(ename)='king'
+
+     EMPNO LOWER(ENAM        SAL                                                
+---------- ---------- ----------                                                
+      7839 king             5000                                                
+
+SQL> select lower('ABCD') from dual;
+
+LOWE                                                                            
+----                                                                            
+abcd                                                                            
+
+SQL> LOWE
+SP2-0042: 알 수 없는 명령어 "LOWE" - 나머지 줄 무시.
+SQL> ----
+SQL> SELECT CONCAT('Data', 'Base')
+  2  FROM DUAL;
+
+CONCAT('                                                                        
+--------                                                                        
+DataBase                                                                        
+
+SQL> select empno,length(empno),ename,lower(ename),initcap(ename)
+  2       from emp
+  3       where length(ename)>=6;
+
+     EMPNO LENGTH(EMPNO) ENAME      LOWER(ENAM INITCAP(EN                       
+---------- ------------- ---------- ---------- ----------                       
+      7654             4 MARTIN     martin     Martin                           
+      7844             4 TURNER     turner     Turner                           
+      7934             4 MILLER     miller     Miller                           
+
+SQL> select substr('Java Web Programming',1,4) from dual;
+
+SUBS                                                                            
+----                                                                            
+Java                                                                            
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1* select substr('Java Web Programming',1,7) from dual
+SQL> /
+
+SUBSTR(                                                                         
+-------                                                                         
+Java We                                                                         
+
+SQL> select empno,ename,job
+  2  from emp
+  3  where substr(ename,1,1) > 'K' and substr(ename,1,1) < 'Y'
+  4  order by ename desc;
+
+     EMPNO ENAME      JOB                                                       
+---------- ---------- ---------                                                 
+      7521 WARD       SALESMAN                                                  
+      7844 TURNER     SALESMAN                                                  
+      7369 SMITH      CLERK                                                     
+      7788 SCOTT      ANALYST                                                   
+      7934 MILLER     CLERK                                                     
+      7654 MARTIN     SALESMAN                                                  
+
+6 개의 행이 선택되었습니다.
+
+SQL> select ename,instr(ename,'O') from emp;
+
+ENAME      INSTR(ENAME,'O')                                                     
+---------- ----------------                                                     
+SMITH                     0                                                     
+ALLEN                     0                                                     
+WARD                      0                                                     
+JONES                     2                                                     
+MARTIN                    0                                                     
+BLAKE                     0                                                     
+CLARK                     0                                                     
+SCOTT                     3                                                     
+KING                      0                                                     
+TURNER                    0                                                     
+ADAMS                     0                                                     
+
+ENAME      INSTR(ENAME,'O')                                                     
+---------- ----------------                                                     
+JAMES                     0                                                     
+FORD                      2                                                     
+MILLER                    0                                                     
+
+14 개의 행이 선택되었습니다.
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1* select ename,instr(ename,'o') from emp
+SQL> /
+
+ENAME      INSTR(ENAME,'O')                                                     
+---------- ----------------                                                     
+SMITH                     0                                                     
+ALLEN                     0                                                     
+WARD                      0                                                     
+JONES                     0                                                     
+MARTIN                    0                                                     
+BLAKE                     0                                                     
+CLARK                     0                                                     
+SCOTT                     0                                                     
+KING                      0                                                     
+TURNER                    0                                                     
+ADAMS                     0                                                     
+
+ENAME      INSTR(ENAME,'O')                                                     
+---------- ----------------                                                     
+JAMES                     0                                                     
+FORD                      0                                                     
+MILLER                    0                                                     
+
+14 개의 행이 선택되었습니다.
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1* select ename,instr(ename,upper('o')) from emp
+SQL> /
+
+ENAME      INSTR(ENAME,UPPER('O'))                                              
+---------- -----------------------                                              
+SMITH                            0                                              
+ALLEN                            0                                              
+WARD                             0                                              
+JONES                            2                                              
+MARTIN                           0                                              
+BLAKE                            0                                              
+CLARK                            0                                              
+SCOTT                            3                                              
+KING                             0                                              
+TURNER                           0                                              
+ADAMS                            0                                              
+
+ENAME      INSTR(ENAME,UPPER('O'))                                              
+---------- -----------------------                                              
+JAMES                            0                                              
+FORD                             2                                              
+MILLER                           0                                              
+
+14 개의 행이 선택되었습니다.
+
+SQL> select round(4567.678),round(4567.678.0),round(4567.678,2),
+  2  round(4567.678,-2) from dual;
+select round(4567.678),round(4567.678.0),round(4567.678,2),
+                                     *
+1행에 오류:
+ORA-00907: 누락된 우괄호 
+
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select round(4567.678),round(4567.678,0),round(4567.678,2),
+  2* round(4567.678,-2) from dual
+SQL> /
+
+ROUND(4567.678) ROUND(4567.678,0) ROUND(4567.678,2) ROUND(4567.678,-2)          
+--------------- ----------------- ----------------- ------------------          
+           4568              4568           4567.68               4600          
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1  select trunc(4567.678),trunc(4567.678,0),trunc(4567.678,2),
+  2* trunc(4567.678,-2) from dual
+SQL> /
+
+TRUNC(4567.678) TRUNC(4567.678,0) TRUNC(4567.678,2) TRUNC(4567.678,-2)          
+--------------- ----------------- ----------------- ------------------          
+           4567              4567           4567.67               4500          
+
+SQL> clear screen
+
+SQL> 
+SQL> select mod(10,3),sign(100),sign(-100),sign(0) from dual;
+
+ MOD(10,3)  SIGN(100) SIGN(-100)    SIGN(0)                                     
+---------- ---------- ---------- ----------                                     
+         1          1         -1          0                                     
+
+SQL> spool off

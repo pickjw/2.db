@@ -1,0 +1,979 @@
+3일차(오라클의 내장함수 종류및 사용방법)
+
+=>DB구현 & SQL활용->다음주 목요일(11/30일 오후 4:00~4:30) 시험
+12/1(금요일)->휴강
+
+1.서술형
+2.단답형
+
+
+==============================================================
+
+
+<과제풀이>
+
+ scott계정으로 로그인/tiger
+
+1.다음과 같이 출력하시오(emp테이블)->ename,job,sal
+
+select ename as "이름",job 업무,sal 급여
+from emp;
+
+
+이름       업무            급여
+---------- --------- ----------
+SMITH      CLERK            800
+ALLEN      SALESMAN        1600
+WARD       SALESMAN        1250
+JONES      MANAGER         2975
+MARTIN     SALESMAN        1250
+BLAKE      MANAGER         2850
+CLARK      MANAGER         2450
+SCOTT      ANALYST         3000
+KING       PRESIDENT       5000
+TURNER     SALESMAN        1500
+ADAMS      CLERK           1100
+
+=>  
+
+
+ 2. Emp테이블의 구조(schema)와 내용을 확인하는 SQL문장?
+
+=> desc emp
+
+=>외부에서 만약에 컴퓨터 실행결과를 제출->메일로 보내는 경우
+=>반드시 실행결과까지 화면캡처해서 보내줄것.
+
+
+이름                                      널?      유형
+----------------------------------------- -------- ---------------
+
+EMPNO                                     NOT NULL NUMBER(4)
+ENAME                                              VARCHAR2(10)
+JOB                                                VARCHAR2(9)
+MGR                                                NUMBER(4)
+HIREDATE                                           DATE
+SAL                                                NUMBER(7,2)
+COMM                                               NUMBER(7,2)
+DEPTNO                                             NUMBER(2)
+
+
+ 3. 다음과 같이 부서번호를 출력하는 문장? (emp)->order by
+
+  부서번호
+----------
+        10
+        20
+        30
+
+=> 
+
+ 4. emp테이블의 이름(ename)과 업무(job)를 연결하여 출력하세요.
+    (||)->Employee=>별칭
+
+=> select ename || ' ' || job as Employee from emp;
+
+EMPLOYEE
+--------------------
+SMITH CLERK
+ALLEN SALESMAN
+WARD SALESMAN
+JONES MANAGER
+MARTIN SALESMAN
+BLAKE MANAGER
+CLARK MANAGER
+SCOTT ANALYST
+KING PRESIDENT
+TURNER SALESMAN
+ADAMS CLERK
+
+EMPLOYEE
+--------------------
+JAMES CLERK
+FORD ANALYST
+MILLER CLERK
+
+14 개의 행이 선택되었습니다
+
+5. 다음과 같이 열명의 별칭과 급여가 2500이상인
+                             ==================
+                             where 검색필드명 연산자 찾는값
+   데이터를 찾는 SQL문장은?
+
+sql>select empno,ename,sal,sal*12 연봉
+    from emp
+    where sal >= 2500;
+
+     EMPNO ENAME             SAL       연봉
+---------- ---------- ---------- ----------
+      7566 JONES            2975      35700
+      7698 BLAKE            2850      34200
+      7788 SCOTT            3000      36000
+      7839 KING             5000      60000
+      7902 FORD             3000      36000
+
+sql>spool C:\webtest\2.db\print\20171120.txt 
+
+<문1> and,or조건->in 연산자
+
+emp테이블에서 사원번호(empno)가 7782 또는 7788 또는 7844인 사원을 검색해서 이 사원의
+급여,연봉(별칭)을 출력하는 SQL구문은? (=)
+
+조건식이 여러개인 경우->and(그리고),or조건(또는)
+
+select sal,sal*12 as 연봉
+from emp
+where empno=7782 or empno=7788 or empno=7844;
+      =======================================
+   조건식에서 or연산자를 여러개 사용하는 경우
+  형식) in (찾는값,'찾는값2',찾는값3,,,)
+
+ed
+
+       SAL       연봉
+---------- ----------
+      2450      29400
+      3000      36000
+      1500      18000
+
+  1  select empno,ename,sal,sal*12 as 연봉
+  2  from emp
+  3* where empno in (7782,7788,7844)
+    ->where empno not in (7782,7788,7844)->7782,7788,7844외의
+                                           다른 직원을 찾기
+      where ename not like 'A%';
+                  ===             A로 시작하는 사람외의 다른
+                                  사람찾기
+SQL> /
+
+     EMPNO ENAME             SAL       연봉
+---------- ---------- ---------- ----------
+      7782 CLARK            2450      29400
+      7788 SCOTT            3000      36000
+      7844 TURNER           1500      18000
+
+ or (또는 이거나)
+
+==========================================================
+<문제2>emp테이블에서 업무(job)가 PRESIDENT 이고(and) 급여가
+1500이상이거나(or) 업무가 SALESMAN인 사원을 찾아서 그 사원의
+사번(empno),이름(ename),업무(job),급여(sal)순으로 출력?
+
+->and 조건만, or조건만 나오는 문제=>and,or이 섞여서 나오는 경우
+
+select empno,ename,job,sal
+from emp
+where job='SALESMAN' or job='PRESIDENT and sal >=1500;
+
+=>논란이 되는 문제?=>명확하지가 않는다 and, or이 같이 나오면
+=>문제=>
+
+**연산자 우선순위**
+
+()
+연결연산자 ||
+관계연산자, >,>=,<,<=,<>,!=
+like,in, not like,not in
+         ===      ===
+not between A and B =>A와 B사이의 범위에 들어가는 데이터이외의
+                      데이터 찾기
+and 연산자
+or 연산자
+================================
+ and 연산자 > or 연산자
+
+select empno,ename,job,sal
+from emp
+where job='SALESMAN' or job='PRESIDENT and sal >=1500;
+                        -------------------------------
+                         1)7839 KING       PRESIDENT       5000
+
+------------------------
+2)    7499 ALLEN      SALESMAN        1600
+      7521 WARD       SALESMAN        1250
+      7654 MARTIN     SALESMAN        1250
+      7844 TURNER     SALESMAN        1500
+ed
+     EMPNO ENAME      JOB              SAL
+---------- ---------- --------- ----------
+      7499 ALLEN      SALESMAN        1600
+      7521 WARD       SALESMAN        1250
+      7654 MARTIN     SALESMAN        1250
+      7839 KING       PRESIDENT       5000
+      7844 TURNER     SALESMAN        1500
+
+
+문제=>where job='SALESMAN' or job='PRESIDENT 인 데이터 중에서
+급여가 1500이상인 데이터를 찾는 문제?
+
+ed
+
+  1  select empno,ename,job,sal
+  2  from emp
+  3* where (job='SALESMAN' or job='PRESIDENT') and sal >=1500
+SQL> /
+
+     EMPNO ENAME      JOB              SAL
+---------- ---------- --------- ----------
+      7499 ALLEN      SALESMAN        1600
+      7839 KING       PRESIDENT       5000
+      7844 TURNER     SALESMAN        1500
+
+결론->and,or연산자가 같이 나오는 문제라면 or연산자를 먼저 계산을
+하는 문제라면 or연산자 조건식을 (  )를 쳐서 우선순위로 지정할것
+
+<문제3> order by구문=>정렬하는 문제
+
+       오름차순(한글 ㄱ,ㄴ,ㄷ,ㄹ~ㅎ,영문자 a,b,c,d,e,f,g,,,z)
+                    1,2,,3,4,5,6,,,,100
+       내림차순(ㅎ~ㄱ,z,,,a),100,99,98,,,,1
+                
+       =>게시판=>글을쓰면 내가 쓴글이 맨 앞에 올라온다.
+형식)
+     select 필드명,,,(별칭)
+     from 테이블명,,테이블2,,,
+     where 조건식==========>테이블에 저장된 순서대로 검색
+     order by 정렬하고자하는 필드명 정렬순서(ascending)(디폴트)
+                                             ===
+    ->디폴트(오름차순) 내림차순->descending(desc)
+
+특징) ** order by 정렬할필드명 [asc|desc] ,필드명2 [asc|desc]~**
+         특성
+                                      1     2     3
+              =>1.숫자로 표현=>select empno,ename,sal from
+                2.다중 정렬->여러개의 필드를 정렬
+                             order by 다음에 나오는 첫번째 필드가
+                             우선순위가 높다.
+
+                3.가상필드로도 정렬이 가능하다.(=계산필드)
+
+
+ 급여가 2000~3000사이에 존재하지 않은 사원리스트를 출력?
+not between A and B           (사번,이름,급여)
+
+sql>select empno,ename,sal from emp
+    where sal not between 2000 and 3000;
+
+     EMPNO ENAME             SAL
+---------- ---------- ----------
+      7369 SMITH             800
+      7499 ALLEN            1600
+      7521 WARD             1250
+      7654 MARTIN           1250
+      7839 KING             5000
+      7844 TURNER           1500
+      7876 ADAMS            1100
+      7900 JAMES             950
+      7934 MILLER           1300
+
+9 개의 행이 선택되었습니다.
+  1  select empno,ename,sal from emp
+  2  where sal not between 2000 and 3000
+  3* order by sal desc
+  4  ;
+
+     EMPNO ENAME             SAL
+---------- ---------- ----------
+      7839 KING             5000
+      7499 ALLEN            1600
+      7844 TURNER           1500
+      7934 MILLER           1300
+      7521 WARD             1250
+      7654 MARTIN           1250
+      7876 ADAMS            1100
+      7900 JAMES             950
+      7369 SMITH             800
+
+9 개의 행이 선택되었습니다.
+ed
+
+  1  select empno,ename,sal from emp
+  2  where sal not between 2000 and 3000
+  3* order by 3 desc
+  4  ;
+
+     EMPNO ENAME             SAL
+---------- ---------- ----------
+      7839 KING             5000
+      7499 ALLEN            1600
+      7844 TURNER           1500
+      7934 MILLER           1300
+      7521 WARD             1250
+      7654 MARTIN           1250
+      7876 ADAMS            1100
+      7900 JAMES             950
+      7369 SMITH             800
+
+9 개의 행이 선택되었습니다.
+
+<문제4>emp테이블에서 먼저 연봉이 많은순으로 정렬하되, 만약에
+sal가 같은 사원이 존재한다면 ename으로 정렬하시오.
+(기본(asc(오름차순))->내림차순으로 정렬하시오.
+=>연봉이 많은 사람순으로 정렬하시오.(내림차순)
+
+=>사원명,급여,연봉->sal*12
+             1              2         3
+sql>select ename as 사원명,sal 급여,sal*12 연봉
+    from emp
+    order by 연봉 desc,ename asc;
+
+사원명           급여       연봉
+---------- ---------- ----------
+KING             5000      60000
+FORD             3000      36000
+SCOTT            3000      36000
+JONES            2975      35700
+BLAKE            2850      34200
+CLARK            2450      29400
+ALLEN            1600      19200
+TURNER           1500      18000
+MILLER           1300      15600
+MARTIN           1250      15000
+WARD             1250      15000
+
+사원명           급여       연봉
+---------- ---------- ----------
+ADAMS            1100      13200
+JAMES             950      11400
+SMITH             800       9600
+
+14 개의 행이 선택되었습니다.
+
+SQL>
+
+
+<문제5>select * from dept;//부서에 대한 정보를 가진 테이블
+
+
+    부서번호 부서이름     부서위치
+
+    DEPTNO DNAME          LOC
+---------- -------------- -----------
+        10 ACCOUNTING     NEW YORK
+        20 RESEARCH       DALLAS
+        30 SALES          CHICAGO (시카코)
+        40 OPERATIONS     BOSTON
+
+emp테이블에서 부서번호가 10번인 사원을 찾아서 그 사원들의
+              where deptno=10
+사원이름,급여,부서번호순으로 출력하되,급여가 많은 순으로
+정렬하시오.(order by sal desc)
+         1    2     3
+select ename,sal,deptno
+from emp
+where deptno=10
+order by 2 desc; //정렬기준이 생략->asc으로 생각
+
+
+ENAME     job        SAL     DEPTNO
+---------- ---------- ----------
+KING             5000         10
+CLARK            2450         10
+MILLER           1300         10
+
+ed  ->job을 추가, 20번 부서
+
+  1  select ename,job,sal,deptno
+  2  from emp
+  3  where deptno=20
+  4* order by 3 desc
+SQL> /
+
+ =>20번부서에 근무하는 직원의 수는 5명
+ =>Scott,ford는 같은 업무(분석가)
+
+ENAME      JOB              SAL     DEPTNO
+---------- --------- ---------- ----------
+SCOTT      ANALYST         3000         20
+FORD       ANALYST         3000         20
+JONES      MANAGER         2975         20
+ADAMS      CLERK           1100         20
+SMITH      CLERK            800         20
+
+SQL> 자주 검색이 되는 SQL구문이 있다.->save명령어로 파일로 저장
+
+<문제6>자주 검색이 되는 SQL구문중에서 특정한 검색값을 입력받아서
+ 그 입력받은 값에 해당하는 데이터를 찾아주는 방법
+
+-->** 파라미터 인수 질의(동적 질의)
+-->**입력받는 부분만 변수로 설정->&변수명(=필드명)**
+-->정적질의
+
+형식)   select ename,job,sal,deptno
+        from emp
+        where deptno=10
+        order by 3 desc
+
+
+deptno 입력?10
+
+10번부서 ~
+
+deptno 입력?20
+
+20번부서
+
+ed
+  1  select ename,job,sal,deptno
+  2  from emp
+  3  where deptno=&deptno
+  4* order by 3 desc
+SQL> /
+deptno의 값을 입력하십시오: 30
+구   3: where deptno=&deptno
+신   3: where deptno=30
+
+ENAME      JOB              SAL     DEPTNO
+---------- --------- ---------- ----------
+BLAKE      MANAGER         2850         30
+ALLEN      SALESMAN        1600         30
+TURNER     SALESMAN        1500         30
+WARD       SALESMAN        1250         30
+MARTIN     SALESMAN        1250         30
+JAMES      CLERK            950         30
+
+6 개의 행이 선택되었습니다.
+
+SQL> /
+deptno의 값을 입력하십시오: 10
+구   3: where deptno=&deptno
+신   3: where deptno=10
+
+ENAME      JOB              SAL     DEPTNO
+---------- --------- ---------- ----------
+KING       PRESIDENT       5000         10
+CLARK      MANAGER         2450         10
+MILLER     CLERK           1300         10
+
+SQL>
+SQL> /
+deptno의 값을 입력하십시오: 40
+구   3: where deptno=&deptno  //자바->PreparedStatement기법이용
+                                            ?
+신   3: where deptno=40
+
+선택된 레코드가 없습니다.
+
+->40번 부서에 근무에 직원이 없다는 표시
+
+ save C:\webtest\2.db\print\deptnosearch.txt파일로 저장할것
+ --------------------------------------------------------
+ save C:\webtest\2.db\print\deptnosearch.txt
+
+SQL> @C:\webtest\2.db\print\deptnosearch.txt
+deptno의 값을 입력하십시오: 20
+구   3: where deptno=&deptno
+신   3: where deptno=20
+
+ENAME      JOB              SAL     DEPTNO
+---------- --------- ---------- ----------
+SCOTT      ANALYST         3000         20
+FORD       ANALYST         3000         20
+JONES      MANAGER         2975         20
+ADAMS      CLERK           1100         20
+SMITH      CLERK            800         20
+
+<문제7>emp테이블에서 사원이름이 SCOTT인 직원을 찾아서
+                  where ename='SCOTT'
+이 직원의 사원번호,이름,급여 순으로 출력하는 SQL작성?
+
+sql>select empno,ename,sal from emp
+    where ename='SCOTT';
+
+     EMPNO ENAME             SAL
+---------- ---------- ----------
+      7788 SCOTT            3000
+
+--------------------------------------------------------
+ed
+
+ename의 값을 입력하십시오: ALLEN
+구   2:     where ename=&ename
+신   2:     where ename=ALLEN
+    where ename=ALLEN  =>where ename='ALLEN'
+                *
+2행에 오류:
+ORA-00904: "ALLEN": 부적합한 식별자 =>문법적으로 문제발생
+==========================================================
+**결론)->동적으로 입력을 받을때 숫자데이터를 입력받는 경우
+                                (deptno)->&필드명(deptno)
+                       문자또는 날짜를 입력->'&필드명' **
+ed
+
+
+
+ename의 값을 입력하십시오:ALLEN
+
+->ALLEN 출력
+
+
+ename의 값을 입력하십시오:TURNER
+
+ALLEN,TURNER,KING
+
+  1  select empno,ename,sal from emp
+  2*     where ename='&ename'
+SQL> /
+ename의 값을 입력하십시오: ALLEN
+구   2:     where ename='&ename'
+신   2:     where ename='ALLEN'
+
+     EMPNO ENAME             SAL
+---------- ---------- ----------
+      7499 ALLEN            1600
+
+SQL> /
+ename의 값을 입력하십시오: KING
+구   2:     where ename='&ename'
+신   2:     where ename='KING'
+
+     EMPNO ENAME             SAL
+---------- ---------- ----------
+      7839 KING             5000
+
+SQL>
+================================================
+ http://www.oracleclub.com =>오라클의 정보를 제공사이트
+
+=>http://www.gurubee.net/ ==>자세한 정보 사이트(변환)
+==========================================================
+<문제8> DDL,DML->insert,update,delete=>rollback,DCL
+
+->rollback이 항상 적용이 되는것은 아니다.
+=>데이터를 백업을 받아야 된다.(권장)
+
+ table-->insert,update,delete->복구X
+ 파일복사->테이블도 복사할 수 있다.(테이블 백업)
+
+ **테이블 백업 2가지**
+
+1.테이블의 full backup->테이블명은 다른것으로 변경->정규적으로
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID
+------------------------------ ------- ----------
+BONUS                          TABLE
+DEPT                           TABLE
+EMP                            TABLE
+SALGRADE                       TABLE
+ZIPCODE                        TABLE
+======================================
+b_emp ->insert,update,delete
+
+형식) create table 백업t명(b_테이블명)
+      as select * from 원본테이블명;
+
+sql> create table b_emp
+     as select * from emp;
+
+테이블이 생성되었습니다.
+
+SQL> select count(*) from b_emp;
+            ========>레코드의 갯수를 세어주는 함수
+  COUNT(*)
+----------
+        14
+
+
+2.테이블의 부분 backup->내가 원하는 자료만 따로 백업
+                        where 조건식
+
+->사원명의 두번째 글자가 D자인 사원을 찾아서 그 사원의
+     like
+  이름과 업무를 출력시켜주는 SQL 작성
+
+->백업테이블명 ->b_ename 저장->select * from b_ename
+
+sql>create table b_ename
+    as select ename,job from emp
+    where ename like '_D%';
+
+테이블이 생성되었습니다.
+
+SQL> select * from b_ename;
+
+ENAME      JOB
+---------- ---------
+ADAMS      CLERK
+
+<문제9>select empno,ename,sal from emp
+       where ename='&ename';
+
+save c:\webtest\2.db\print\namesearch.txt 
+
+=>주로 영문자를 검색=>소문자로 사용하는 경우가 많다.
+=>검색을 할때 편하게 검색->소문자-자동적으로 대문자로 변환->대문자
+                           소문자->소문자 출력
+
+함수를 사용->excel(표 작성)
+----------------------------
+목적->1.계산 목적(통계,최대값,최소값,평균값,,,,)
+      2.편리성 때문에 ->원하는 결과
+
+=>문자함수(=>문자위주 검색), 숫자함수(통계,반올림,,,),날짜함수,,,변환
+-----------------------------------------------------------------------
+<문제10> dual테이블=>오라클 자체에서 기본적으로 제공된 테이블
+
+desc dual //목적->간단하게 오라클에서 함수를 이용해서 계산결과값을
+                  확인할때 사용하는 테이블
+
+ 형식) select 함수명(처리할 값) from 테이블명
+
+  ->오늘 날짜를 구하고 싶다.->회원가입->날짜를 입력(X)
+  ->sysdate <---->mysql (now())
+
+ 이름                                      널?      유형
+ ----------------------------------------- -------- -------------------
+
+ DUMMY                                              VARCHAR2(1)
+
+
+select * from tab;//목록->테이블 리스트
+
+sql> select sysdate,ename from emp; //기존의 테이블의 필드와
+                                      함수를 같이 섞어서 사용가능
+
+==>단점) 함수를 간단하게 계산결과값 출력 ->기존의 테이블과 같이 사용
+
+SYSDATE  ENAME
+-------- ----------
+17/11/20 SMITH
+17/11/20 ALLEN
+17/11/20 WARD
+17/11/20 JONES
+17/11/20 MARTIN
+17/11/20 BLAKE
+17/11/20 CLARK
+17/11/20 SCOTT
+17/11/20 KING
+17/11/20 TURNER
+17/11/20 ADAMS
+
+SYSDATE  ENAME
+-------- ----------
+17/11/20 JAMES
+17/11/20 FORD
+17/11/20 MILLER
+
+14 개의 행이 선택되었습니다.
+
+ 함수를 간단하게 계산결과값 출력->dual (필드가 하나밖에 없다)
+
+sql>select sysdate from dual;
+
+SYSDATE
+--------
+17/11/20
+
+SQL> select 20*45 from dual; //간단한 계산 출력
+
+     20*45
+----------
+       900
+
+
+SQL> 상품검색,이름검색,날짜검색->영문자->소문자->대문자 변환
+
+lower(대문자)=>소문자로 변환 ,upper(소문자)->대문자로 
+                              upper('abd')=>ABD
+데이터의 길이->length(문자열)->길이
+
+형식) select 함수명(값 또는 필드명) from 테이블명  //화면에 출력
+      where 함수명(필드명) //찾는경우에 함수를 이용해서 찾고싶을때
+      order by~
+
+sql>@c:\webtest\2.db\print\namesearch.txt
+================================================================
+  1  select empno,ename,sal from emp
+  2*        where ename=upper('&ename')
+SQL> /
+ename의 값을 입력하십시오: allen
+구   2:        where ename=upper('&ename')
+신   2:        where ename=upper('allen')
+
+     EMPNO ENAME             SAL
+---------- ---------- ----------
+      7499 ALLEN            1600
+
+SQL>ed
+
+ename의 값을 입력하십시오: king  
+구   2:        where ename=upper('&ename')
+신   2:        where ename=upper('king')
+                     'ALLEN'=upper('allen')
+                             'ALLEN'
+                             'allen' ='allen'
+
+     EMPNO LOWER(ENAM        SAL
+---------- ---------- ----------
+      7839 king             5000
+------------------------------------
+ename검색->allen->'ALLEN'
+
+ed
+
+  1  select empno,lower(ename),sal from emp
+  2*        where lower(ename)='&ename'
+SQL> /
+ename의 값을 입력하십시오: king
+구   2:        where lower(ename)='&ename'
+신   2:        where lower(ename)='king'
+
+     EMPNO LOWER(ENAM        SAL
+---------- ---------- ----------
+      7839 king             5000
+
+sql> select lower('ABCD') from dual; //abcd
+
+<문11>이름이 6글자 이상인 사원의 사번과 이름과 급여를 출력하라.
+      length(ename)>=6
+
+sql> select empno,length(empno),ename,lower(ename),initcap(ename)
+     from emp
+     where length(ename)>=6;//6
+
+     EMPNO LENGTH(EMPNO) ENAME      LOWER(ENAM INITCAP(EN
+---------- ------------- ---------- ---------- ----------
+      7654             4 MARTIN     martin     Martin
+      7844             4 TURNER     turner     Turner
+      7934             4 MILLER     miller     Miller
+
+<문12> 문자열 검색="Java Web Programming"===>Web 추출(분리)
+   ** substr(검색할 문자열,시작위치,뽑아낼 문자열 갯수)
+
+ 0123456789 =>언어는 문자열의 순서는 0부터 시작
+"Java Web Programming"
+
+ 12345678910~  =>오라클의 문자열의 순서는 1부터 시작
+"Java Web Programming"
+                    1234567
+sql> select substr('Java Web Programming',1,4) from dual;
+
+SUBS
+----
+Java
+
+SQL> ed
+file afiedt.buf(이)가 기록되었습니다
+
+  1* select substr('Java Web Programming',1,7) from dual
+SQL> /
+
+SUBSTR(
+-------
+Java We  =>공백도 문자하나로 취급->공백까지 계산
+
+********
+<문제13>emp테이블에서 사원이름의 첫글자가 'K'보다 크고(and),
+                       substr(ename,1,1)
+********
+
+'Y'자보다 적은 사원을 검색해서 찾은 그 사원의 사번,이름,업무
+순으로 출력하시오.단(이름순으로 내림차순하시오)
+범위를 지정->숫자만 해당X ->문자,날짜도 가능하다.
+
+ ~ where ename between 'A' and 'S' //A ~ S자 사이의 문자열을 검색
+
+select empno,ename,job
+from emp
+where substr(ename,1,1) > 'K' and substr(ename,1,1) < 'Y'
+order by ename desc;
+
+  ~L,M,N,O,P,Q,R,S,T,U,V,W,X~
+                  <----------
+     EMPNO ENAME      JOB
+---------- ---------- ---------
+      7521 WARD       SALESMAN
+      7844 TURNER     SALESMAN
+      7369 SMITH      CLERK
+      7788 SCOTT      ANALYST
+      7934 MILLER     CLERK
+      7654 MARTIN     SALESMAN
+
+6 개의 행이 선택되었습니다.
+
+   81/02/23  substr(hiredate,1,2)
+   ==>년도
+
+<문제14> 중첩함수->함수내부에 또 다른 함수가 있는 경우->중첩함수
+  문자열 검색중에서 어느 특정한 문자의 위치를 구하기
+  ->instr(검색할문자열,특정문자)
+
+sql>select ename,instr(ename,'o') from emp;
+
+ENAME      INSTR(ENAME,'O')
+---------- ----------------
+SMITH                     0 ===>해당되는 문자가 없는 0을 반환
+ALLEN                     0
+WARD                      0
+JONES                     2 =>JONES->두번째 문자 O
+MARTIN                    0
+BLAKE                     0
+CLARK                     0
+SCOTT                     3=>SCOTT=>세번째 문자 O
+KING                      0
+TURNER                    0
+ADAMS                     0
+
+ENAME      INSTR(ENAME,'O')
+---------- ----------------
+JAMES                     0
+FORD                      2
+MILLER                    0
+
+14 개의 행이 선택되었습니다.
+
+ed
+
+  1* select ename,instr(ename,'o') from emp //소문자이기에 소문자X
+
+   ====>함수(내부 함수())=>실행순서는 내부함수부터 실행
+
+SQL> /
+
+ENAME      INSTR(ENAME,'O')
+---------- ----------------
+SMITH                     0
+ALLEN                     0
+WARD                      0
+JONES                     0
+MARTIN                    0
+BLAKE                     0
+CLARK                     0
+SCOTT                     0
+KING                      0
+TURNER                    0
+ADAMS                     0
+
+ENAME      INSTR(ENAME,'O')
+---------- ----------------
+JAMES                     0
+FORD                      0
+MILLER                    0
+
+14 개의 행이 선택되었습니다.
+
+ed
+
+  1* select ename,instr(ename,upper('o')) from emp
+     ->소문자->대문자('O') -->몇번째 위치에 존재하는지 번호
+                           ==>문자열의 인덱스위치 번호
+SQL> /
+
+ENAME      INSTR(ENAME,UPPER('O'))
+---------- -----------------------
+SMITH                            0
+ALLEN                            0
+WARD                             0
+JONES                            2
+MARTIN                           0
+BLAKE                            0
+CLARK                            0
+SCOTT                            3
+KING                             0
+TURNER                           0
+ADAMS                            0
+
+ENAME      INSTR(ENAME,UPPER('O'))
+---------- -----------------------
+JAMES                            0
+FORD                             2
+MILLER                           0
+
+14 개의 행이 선택되었습니다.
+
+<문제15>숫자함수->계산,반올림(round),내림(trunc)
+
+ 형식) round(숫자,반올림할 자릿수(생략가능)
+
+select round(4567.678),round(4567.678,0),round(4567.678,2),
+round(4567.678,-2) from dual;
+
+
+ed
+  1  select round(4567.678),round(4567.678,0),round(4567.678,2),
+  2* round(4567.678,-2) from dual
+SQL> /
+
+ROUND(4567.678) ROUND(4567.678,0) ROUND(4567.678,2) ROUND(4567.678,-2)
+--------------- ----------------- ----------------- ------------------
+           4568              4568           4567.68               4600
+
+ed
+
+소수점을 잘라내는 함수(=절삭)=>trunc
+소수점 자리수를 맞춰주는 함수->자릿수를 맞추기위해서 소수점이하를
+버린다.
+ 
+
+  1  select trunc(4567.678),trunc(4567.678,0),trunc(4567.678,2),
+  2* trunc(4567.678,-2) from dual
+SQL> /
+
+TRUNC(4567.678) TRUNC(4567.678,0) TRUNC(4567.678,2) TRUNC(4567.678,-2)
+--------------- ----------------- ----------------- ------------------
+           4567              4567           4567.67               4500
+
+
+mod=>나머지를  구해주는 함수,sign(숫자)->양수(1),음수(-1),0일지를 구분해주는
+                                        함수
+
+sql>select mod(10,3),sign(100),sign(-100),sign(0) from dual;
+               1        1          -1        0
+ MOD(10,3)  SIGN(100) SIGN(-100)    SIGN(0)
+---------- ---------- ---------- ----------
+         1          1         -1          0
+
+=======================================================
+=>날짜함수,변환함수,DDL(create table,create user)~
+                     SQL활용 p8(테이블과 제약조건의 변경)
+                               =>ERD를 구성?
+                     p9,10,11.12
+----------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

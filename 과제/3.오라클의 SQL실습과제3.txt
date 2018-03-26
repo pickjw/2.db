@@ -1,0 +1,60 @@
+
+<문제1>
+
+select ename,job,sal,decode(job,'ANALYST',sal*1.1,
+                                'CLERK',sal*1.15,
+                               'MANAGER',sal*1.2,sal) 급여인상액
+from emp
+order by sal desc;
+
+ENAME      JOB              SAL 급여인상액
+---------- --------- ---------- ----------
+KING       PRESIDENT       5000       5000
+FORD       ANALYST         3000       3300
+SCOTT      ANALYST         3000       3300
+JONES      MANAGER         2975       3570
+BLAKE      MANAGER         2850       3420
+CLARK      MANAGER         2450       2940
+ALLEN      SALESMAN        1600       1600
+TURNER     SALESMAN        1500       1500
+MILLER     CLERK           1300       1495
+WARD       SALESMAN        1250       1250
+MARTIN     SALESMAN        1250       1250
+
+ENAME      JOB              SAL 급여인상액
+---------- --------- ---------- ----------
+ADAMS      CLERK           1100       1265
+JAMES      CLERK            950     1092.5
+SMITH      CLERK            800        920
+
+14 개의 행이 선택되었습니다.
+
+=>형식) case 적용대상 필드명 when 조건식(분석가) then 결과1(계산식)
+                           ,,when 조건식(매니저) then 결과1(계산식2)
+                           else 결과 n
+
+        end 별칭명
+
+으로 변경하는 SQL구문을 작성하시오.
+
+=>
+
+
+
+
+<문제2>emp테이블에서 전체급여가 5000을 초과하는 각 업무에 대해서
+ 업무와 월급여의 합계를 출력하는 SQL을 작성하시오
+
+(단 업무중에서 MANAGER는 제외하고 월급여의 합계로 내림차순 하시오)
+
+
+
+
+
+
+<실행결과>
+
+JOB        급여 합계 =>별칭쓸것.
+--------- ----------
+ANALYST         6000
+SALESMAN        5600

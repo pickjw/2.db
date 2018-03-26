@@ -1,0 +1,788 @@
+SQL> select count(*) from b_dept2;
+
+  COUNT(*)                                                                      
+----------                                                                      
+         9                                                                      
+
+SQL> show user
+USER은 "SCOTT"입니다
+SQL> clear screen
+
+SQL> 
+SQL> grant select,insert,update on b_dept2 to test3 with grant option;
+grant select,insert,update on b_dept2 to test3 with grant option
+                                         *
+1행에 오류:
+ORA-01917: 사용자 또는 롤 'TEST3'(이)가 존재하지 않습니다 
+
+
+SQL> conn / as sysdba
+연결되었습니다.
+SQL> create user test2 identified by test2;
+
+사용자가 생성되었습니다.
+
+SQL> create user test3 identified by test3;
+
+사용자가 생성되었습니다.
+
+SQL> create user test4 identified by test4;
+
+사용자가 생성되었습니다.
+
+SQL> grant connect,resource to test2,test3,test4;
+
+권한이 부여되었습니다.
+
+SQL> conn scott/tiger
+연결되었습니다.
+SQL> clear screen
+
+SQL> 
+SQL> grant select,insert,update on b_dept2 to test3 with grant option;
+
+권한이 부여되었습니다.
+
+SQL> conn test3/test3
+연결되었습니다.
+SQL> grant insert on scott.b_dept2 to test2;
+
+권한이 부여되었습니다.
+
+SQL> grant select,update on scott.b_dept2 to test4;
+
+권한이 부여되었습니다.
+
+SQL> conn test4/test4
+연결되었습니다.
+SQL> select * from scott.b_dept2;
+
+    DEPTNO DNAME          LOC                                                   
+---------- -------------- -------------                                         
+        10 ACCOUNTING     NEW YORK                                              
+        20 RESEARCH       DALLAS                                                
+        30 SALES          CHICAGO                                               
+        40 OPERATIONS     BOSTON                                                
+        50 SUPPORT        KWANGJU                                               
+        60 TESTING        SEOUL                                                 
+        70 TESTING2       PUSAN                                                 
+        80 TESTING3       SEOUL2                                                
+        90 TESTING$       SEOUL3                                                
+
+9 개의 행이 선택되었습니다.
+
+SQL> update scott.b_dept2 set loc='DALLAS' where deptno=60;
+
+1 행이 갱신되었습니다.
+
+SQL> select loc from scott.b_dept2 where deptno=60;
+
+LOC                                                                             
+-------------                                                                   
+DALLAS                                                                          
+
+SQL> create synonym buser2 for scott.b_dept2;
+create synonym buser2 for scott.b_dept2
+*
+1행에 오류:
+ORA-01031: 권한이 불충분합니다 
+
+
+SQL> show user
+USER은 "TEST4"입니다
+SQL> conn scott/tiger
+연결되었습니다.
+SQL> revoke select,update,insert on b_dept2 from test3;
+
+권한이 취소되었습니다.
+
+SQL> conn test4/test4
+연결되었습니다.
+SQL> select * from scott.b_dept2;
+select * from scott.b_dept2
+                    *
+1행에 오류:
+ORA-00942: 테이블 또는 뷰가 존재하지 않습니다 
+
+
+SQL> select * from tab;
+
+선택된 레코드가 없습니다.
+
+SQL> conn scott/tiger
+연결되었습니다.
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+BONUS                          TABLE                                            
+B_DEPT2                        TABLE                                            
+B_EMP                          TABLE                                            
+B_EMP2                         TABLE                                            
+B_EMP4                         TABLE                                            
+B_ENAME                        TABLE                                            
+DEPT                           TABLE                                            
+DEPT_SALES                     TABLE                                            
+EMP                            TABLE                                            
+EMP_DEPTNO                     TABLE                                            
+SALGRADE                       TABLE                                            
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+TEST1                          TABLE                                            
+VIEW_30                        VIEW                                             
+V_DALLS                        VIEW                                             
+V_DALLS2                       VIEW                                             
+V_DEPT30                       VIEW                                             
+V_DNAME                        VIEW                                             
+V_EMP10                        VIEW                                             
+V_EMP20                        VIEW                                             
+V_INDEX                        VIEW                                             
+V_MAXSAL                       VIEW                                             
+V_SALE                         VIEW                                             
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+V_SEARCH                       VIEW                                             
+V_SEQUENCE_SEQ                 VIEW                                             
+V_SMITH                        VIEW                                             
+V_TEST1                        VIEW                                             
+ZIPCODE                        TABLE                                            
+
+27 개의 행이 선택되었습니다.
+
+SQL> delete from b_dept2;
+
+9 행이 삭제되었습니다.
+
+SQL> select * from b_dept2;
+
+선택된 레코드가 없습니다.
+
+SQL> rollback;
+
+롤백이 완료되었습니다.
+
+SQL> select * from b_dept2;
+
+    DEPTNO DNAME          LOC                                                   
+---------- -------------- -------------                                         
+        10 ACCOUNTING     NEW YORK                                              
+        20 RESEARCH       DALLAS                                                
+        30 SALES          CHICAGO                                               
+        40 OPERATIONS     BOSTON                                                
+        50 SUPPORT        KWANGJU                                               
+        60 TESTING        DALLAS                                                
+        70 TESTING2       PUSAN                                                 
+        80 TESTING3       SEOUL2                                                
+        90 TESTING$       SEOUL3                                                
+
+9 개의 행이 선택되었습니다.
+
+SQL> truncate table b_dept2;
+
+테이블이 잘렸습니다.
+
+SQL> select * from b_dept2;
+
+선택된 레코드가 없습니다.
+
+SQL> rollback;
+
+롤백이 완료되었습니다.
+
+SQL> select * from b_dept2;
+
+선택된 레코드가 없습니다.
+
+SQL> clear screen
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+BONUS                          TABLE                                            
+B_DEPT2                        TABLE                                            
+B_EMP                          TABLE                                            
+B_EMP2                         TABLE                                            
+B_EMP4                         TABLE                                            
+B_ENAME                        TABLE                                            
+DEPT                           TABLE                                            
+DEPT_SALES                     TABLE                                            
+EMP                            TABLE                                            
+EMP_DEPTNO                     TABLE                                            
+SALGRADE                       TABLE                                            
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+TEST1                          TABLE                                            
+VIEW_30                        VIEW                                             
+V_DALLS                        VIEW                                             
+V_DALLS2                       VIEW                                             
+V_DEPT30                       VIEW                                             
+V_DNAME                        VIEW                                             
+V_EMP10                        VIEW                                             
+V_EMP20                        VIEW                                             
+V_INDEX                        VIEW                                             
+V_MAXSAL                       VIEW                                             
+V_SALE                         VIEW                                             
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+V_SEARCH                       VIEW                                             
+V_SEQUENCE_SEQ                 VIEW                                             
+V_SMITH                        VIEW                                             
+V_TEST1                        VIEW                                             
+ZIPCODE                        TABLE                                            
+
+27 개의 행이 선택되었습니다.
+
+SQL> select count(*) from b_emp4;
+
+  COUNT(*)                                                                      
+----------                                                                      
+        13                                                                      
+
+SQL> drop table b_emp4;
+
+테이블이 삭제되었습니다.
+
+SQL> select * from b_emp4;
+select * from b_emp4
+              *
+1행에 오류:
+ORA-00942: 테이블 또는 뷰가 존재하지 않습니다 
+
+
+SQL> rollback;
+
+롤백이 완료되었습니다.
+
+SQL> select * from b_emp4;
+select * from b_emp4
+              *
+1행에 오류:
+ORA-00942: 테이블 또는 뷰가 존재하지 않습니다 
+
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+BIN$+mYvv3xMR9q7Zme+G93ppQ==$0 TABLE                                            
+BONUS                          TABLE                                            
+B_DEPT2                        TABLE                                            
+B_EMP                          TABLE                                            
+B_EMP2                         TABLE                                            
+B_ENAME                        TABLE                                            
+DEPT                           TABLE                                            
+DEPT_SALES                     TABLE                                            
+EMP                            TABLE                                            
+EMP_DEPTNO                     TABLE                                            
+SALGRADE                       TABLE                                            
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+TEST1                          TABLE                                            
+VIEW_30                        VIEW                                             
+V_DALLS                        VIEW                                             
+V_DALLS2                       VIEW                                             
+V_DEPT30                       VIEW                                             
+V_DNAME                        VIEW                                             
+V_EMP10                        VIEW                                             
+V_EMP20                        VIEW                                             
+V_INDEX                        VIEW                                             
+V_MAXSAL                       VIEW                                             
+V_SALE                         VIEW                                             
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+V_SEARCH                       VIEW                                             
+V_SEQUENCE_SEQ                 VIEW                                             
+V_SMITH                        VIEW                                             
+V_TEST1                        VIEW                                             
+ZIPCODE                        TABLE                                            
+
+27 개의 행이 선택되었습니다.
+
+SQL> desc user_recyclebin
+ 이름                                      널?      유형
+ ----------------------------------------- -------- ----------------------------
+ OBJECT_NAME                               NOT NULL VARCHAR2(30)
+ ORIGINAL_NAME                                      VARCHAR2(32)
+ OPERATION                                          VARCHAR2(9)
+ TYPE                                               VARCHAR2(25)
+ TS_NAME                                            VARCHAR2(30)
+ CREATETIME                                         VARCHAR2(19)
+ DROPTIME                                           VARCHAR2(19)
+ DROPSCN                                            NUMBER
+ PARTITION_NAME                                     VARCHAR2(32)
+ CAN_UNDROP                                         VARCHAR2(3)
+ CAN_PURGE                                          VARCHAR2(3)
+ RELATED                                   NOT NULL NUMBER
+ BASE_OBJECT                               NOT NULL NUMBER
+ PURGE_OBJECT                              NOT NULL NUMBER
+ SPACE                                              NUMBER
+
+SQL> show recyclebin
+ORIGINAL NAME    RECYCLEBIN NAME                OBJECT TYPE  DROP TIME          
+---------------- ------------------------------ ------------ -------------------
+B_EMP4           BIN$+mYvv3xMR9q7Zme+G93ppQ==$0 TABLE        2017-11-30:10:58:09
+SQL> flashback table b_emp4 to before drop;
+
+플래시백이 완료되었습니다.
+
+SQL> select * from b_emp4;
+
+     EMPNO ENAME      JOB              MGR HIREDATE        SAL       COMM       
+---------- ---------- --------- ---------- -------- ---------- ----------       
+    DEPTNO                                                                      
+----------                                                                      
+      7369 SMITH      CLERK           7902 80/12/17        800                  
+        20                                                                      
+                                                                                
+      7521 WARD       SALESMAN        7698 81/02/22       1250        500       
+        30                                                                      
+                                                                                
+      7566 JONES      MANAGER         7839 81/04/02       2975                  
+        20                                                                      
+                                                                                
+
+     EMPNO ENAME      JOB              MGR HIREDATE        SAL       COMM       
+---------- ---------- --------- ---------- -------- ---------- ----------       
+    DEPTNO                                                                      
+----------                                                                      
+      7654 MARTIN     SALESMAN        7698 81/09/28       1250       1400       
+        30                                                                      
+                                                                                
+      7698 BLAKE      MANAGER         7839 81/05/01       2850                  
+        30                                                                      
+                                                                                
+      7782 CLARK      MANAGER         7839 81/06/09       2450                  
+        10                                                                      
+                                                                                
+
+     EMPNO ENAME      JOB              MGR HIREDATE        SAL       COMM       
+---------- ---------- --------- ---------- -------- ---------- ----------       
+    DEPTNO                                                                      
+----------                                                                      
+      7788 SCOTT      ANALYST         7566 87/04/19       3000                  
+        20                                                                      
+                                                                                
+      7839 KING       PRESIDENT            81/11/17       5000                  
+        10                                                                      
+                                                                                
+      7844 TURNER     SALESMAN        7698 81/09/08       1500          0       
+        30                                                                      
+                                                                                
+
+     EMPNO ENAME      JOB              MGR HIREDATE        SAL       COMM       
+---------- ---------- --------- ---------- -------- ---------- ----------       
+    DEPTNO                                                                      
+----------                                                                      
+      7876 ADAMS      CLERK           7788 87/05/23       1100                  
+        20                                                                      
+                                                                                
+      7900 JAMES      CLERK           7698 81/12/03        950                  
+        30                                                                      
+                                                                                
+      7902 FORD       ANALYST         7566 81/12/03       3000                  
+        20                                                                      
+                                                                                
+
+     EMPNO ENAME      JOB              MGR HIREDATE        SAL       COMM       
+---------- ---------- --------- ---------- -------- ---------- ----------       
+    DEPTNO                                                                      
+----------                                                                      
+      7934 MILLER     CLERK           7782 82/01/23       1300                  
+        10                                                                      
+                                                                                
+
+13 개의 행이 선택되었습니다.
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+BONUS                          TABLE                                            
+B_DEPT2                        TABLE                                            
+B_EMP                          TABLE                                            
+B_EMP2                         TABLE                                            
+B_EMP4                         TABLE                                            
+B_ENAME                        TABLE                                            
+DEPT                           TABLE                                            
+DEPT_SALES                     TABLE                                            
+EMP                            TABLE                                            
+EMP_DEPTNO                     TABLE                                            
+SALGRADE                       TABLE                                            
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+TEST1                          TABLE                                            
+VIEW_30                        VIEW                                             
+V_DALLS                        VIEW                                             
+V_DALLS2                       VIEW                                             
+V_DEPT30                       VIEW                                             
+V_DNAME                        VIEW                                             
+V_EMP10                        VIEW                                             
+V_EMP20                        VIEW                                             
+V_INDEX                        VIEW                                             
+V_MAXSAL                       VIEW                                             
+V_SALE                         VIEW                                             
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+V_SEARCH                       VIEW                                             
+V_SEQUENCE_SEQ                 VIEW                                             
+V_SMITH                        VIEW                                             
+V_TEST1                        VIEW                                             
+ZIPCODE                        TABLE                                            
+
+27 개의 행이 선택되었습니다.
+
+SQL> drop table b_emp4 purge;
+
+테이블이 삭제되었습니다.
+
+SQL> show recyclebin
+SQL> flashback table b_emp4 to before drop
+  2  ;
+flashback table b_emp4 to before drop
+*
+1행에 오류:
+ORA-38305: 객체가 RECYCLE BIN에 없음 
+
+
+SQL> create table t1(a number);
+
+테이블이 생성되었습니다.
+
+SQL> drop table t1;
+
+테이블이 삭제되었습니다.
+
+SQL> create table t1(a varchar2(10));
+
+테이블이 생성되었습니다.
+
+SQL> drop table t1;
+
+테이블이 삭제되었습니다.
+
+SQL> create table t1(a date);
+
+테이블이 생성되었습니다.
+
+SQL> drop table t1;
+
+테이블이 삭제되었습니다.
+
+SQL> create table t1(a number);
+
+테이블이 생성되었습니다.
+
+SQL> drop table t1;
+
+테이블이 삭제되었습니다.
+
+SQL> show recyclebin
+ORIGINAL NAME    RECYCLEBIN NAME                OBJECT TYPE  DROP TIME          
+---------------- ------------------------------ ------------ -------------------
+T1               BIN$wT8xtJg9SKaYkkToiOvg6w==$0 TABLE        2017-11-30:11:35:36
+T1               BIN$df2bc97oQBKX3BMoAXj0OQ==$0 TABLE        2017-11-30:11:34:29
+T1               BIN$gAPfIqxdStqI6yKqbOi0pQ==$0 TABLE        2017-11-30:11:33:35
+T1               BIN$wzd79UxtSUqCEQCMkNcoVw==$0 TABLE        2017-11-30:11:32:09
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+BIN$df2bc97oQBKX3BMoAXj0OQ==$0 TABLE                                            
+BIN$gAPfIqxdStqI6yKqbOi0pQ==$0 TABLE                                            
+BIN$wT8xtJg9SKaYkkToiOvg6w==$0 TABLE                                            
+BIN$wzd79UxtSUqCEQCMkNcoVw==$0 TABLE                                            
+BONUS                          TABLE                                            
+B_DEPT2                        TABLE                                            
+B_EMP                          TABLE                                            
+B_EMP2                         TABLE                                            
+B_ENAME                        TABLE                                            
+DEPT                           TABLE                                            
+DEPT_SALES                     TABLE                                            
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+EMP                            TABLE                                            
+EMP_DEPTNO                     TABLE                                            
+SALGRADE                       TABLE                                            
+TEST1                          TABLE                                            
+VIEW_30                        VIEW                                             
+V_DALLS                        VIEW                                             
+V_DALLS2                       VIEW                                             
+V_DEPT30                       VIEW                                             
+V_DNAME                        VIEW                                             
+V_EMP10                        VIEW                                             
+V_EMP20                        VIEW                                             
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+V_INDEX                        VIEW                                             
+V_MAXSAL                       VIEW                                             
+V_SALE                         VIEW                                             
+V_SEARCH                       VIEW                                             
+V_SEQUENCE_SEQ                 VIEW                                             
+V_SMITH                        VIEW                                             
+V_TEST1                        VIEW                                             
+ZIPCODE                        TABLE                                            
+
+30 개의 행이 선택되었습니다.
+
+SQL> flashback table t1 to before drop;
+
+플래시백이 완료되었습니다.
+
+SQL> show recyclebin
+ORIGINAL NAME    RECYCLEBIN NAME                OBJECT TYPE  DROP TIME          
+---------------- ------------------------------ ------------ -------------------
+T1               BIN$df2bc97oQBKX3BMoAXj0OQ==$0 TABLE        2017-11-30:11:34:29
+T1               BIN$gAPfIqxdStqI6yKqbOi0pQ==$0 TABLE        2017-11-30:11:33:35
+T1               BIN$wzd79UxtSUqCEQCMkNcoVw==$0 TABLE        2017-11-30:11:32:09
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+BIN$df2bc97oQBKX3BMoAXj0OQ==$0 TABLE                                            
+BIN$gAPfIqxdStqI6yKqbOi0pQ==$0 TABLE                                            
+BIN$wzd79UxtSUqCEQCMkNcoVw==$0 TABLE                                            
+BONUS                          TABLE                                            
+B_DEPT2                        TABLE                                            
+B_EMP                          TABLE                                            
+B_EMP2                         TABLE                                            
+B_ENAME                        TABLE                                            
+DEPT                           TABLE                                            
+DEPT_SALES                     TABLE                                            
+EMP                            TABLE                                            
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+EMP_DEPTNO                     TABLE                                            
+SALGRADE                       TABLE                                            
+T1                             TABLE                                            
+TEST1                          TABLE                                            
+VIEW_30                        VIEW                                             
+V_DALLS                        VIEW                                             
+V_DALLS2                       VIEW                                             
+V_DEPT30                       VIEW                                             
+V_DNAME                        VIEW                                             
+V_EMP10                        VIEW                                             
+V_EMP20                        VIEW                                             
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+V_INDEX                        VIEW                                             
+V_MAXSAL                       VIEW                                             
+V_SALE                         VIEW                                             
+V_SEARCH                       VIEW                                             
+V_SEQUENCE_SEQ                 VIEW                                             
+V_SMITH                        VIEW                                             
+V_TEST1                        VIEW                                             
+ZIPCODE                        TABLE                                            
+
+30 개의 행이 선택되었습니다.
+
+SQL> flashback table "BIN$df2bc97oQBKX3BMoAXj0OQ==$0" to before drop
+  2      rename to imsitest;
+
+플래시백이 완료되었습니다.
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+BIN$gAPfIqxdStqI6yKqbOi0pQ==$0 TABLE                                            
+BIN$wzd79UxtSUqCEQCMkNcoVw==$0 TABLE                                            
+BONUS                          TABLE                                            
+B_DEPT2                        TABLE                                            
+B_EMP                          TABLE                                            
+B_EMP2                         TABLE                                            
+B_ENAME                        TABLE                                            
+DEPT                           TABLE                                            
+DEPT_SALES                     TABLE                                            
+EMP                            TABLE                                            
+EMP_DEPTNO                     TABLE                                            
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+IMSITEST                       TABLE                                            
+SALGRADE                       TABLE                                            
+T1                             TABLE                                            
+TEST1                          TABLE                                            
+VIEW_30                        VIEW                                             
+V_DALLS                        VIEW                                             
+V_DALLS2                       VIEW                                             
+V_DEPT30                       VIEW                                             
+V_DNAME                        VIEW                                             
+V_EMP10                        VIEW                                             
+V_EMP20                        VIEW                                             
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+V_INDEX                        VIEW                                             
+V_MAXSAL                       VIEW                                             
+V_SALE                         VIEW                                             
+V_SEARCH                       VIEW                                             
+V_SEQUENCE_SEQ                 VIEW                                             
+V_SMITH                        VIEW                                             
+V_TEST1                        VIEW                                             
+ZIPCODE                        TABLE                                            
+
+30 개의 행이 선택되었습니다.
+
+SQL> clear screen
+
+SQL> 
+SQL> conn / as sysdba
+연결되었습니다.
+SQL> create tablespace oradata datafile
+  2      'C:\webtest\2.db\oradata.dbf' size 10m;
+
+테이블스페이스가 생성되었습니다.
+
+SQL> select * from v$tablespace;
+
+       TS# NAME                           INC BIG FLA ENC                       
+---------- ------------------------------ --- --- --- ---                       
+         0 SYSTEM                         YES NO  YES                           
+         1 SYSAUX                         YES NO  YES                           
+         2 UNDOTBS1                       YES NO  YES                           
+         4 USERS                          YES NO  YES                           
+         3 TEMP                           NO  NO  YES                           
+         6 EXAMPLE                        YES NO  YES                           
+         7 ORADATA                        YES NO  YES                           
+
+7 개의 행이 선택되었습니다.
+
+SQL> create table t2(c1 number) tablespace oradata;
+
+테이블이 생성되었습니다.
+
+SQL> create user kim2 identified by kim2 default tablespace oradata;
+
+사용자가 생성되었습니다.
+
+SQL> grant connect,resource to kim2;
+
+권한이 부여되었습니다.
+
+SQL> conn kim2/kim2
+연결되었습니다.
+SQL> desc user_users
+ 이름                                      널?      유형
+ ----------------------------------------- -------- ----------------------------
+ USERNAME                                  NOT NULL VARCHAR2(30)
+ USER_ID                                   NOT NULL NUMBER
+ ACCOUNT_STATUS                            NOT NULL VARCHAR2(32)
+ LOCK_DATE                                          DATE
+ EXPIRY_DATE                                        DATE
+ DEFAULT_TABLESPACE                        NOT NULL VARCHAR2(30)
+ TEMPORARY_TABLESPACE                      NOT NULL VARCHAR2(30)
+ CREATED                                   NOT NULL DATE
+ INITIAL_RSRC_CONSUMER_GROUP                        VARCHAR2(30)
+ EXTERNAL_NAME                                      VARCHAR2(4000)
+
+SQL> select username,expiry_date,default_tablespace,created
+  2      from user_users;
+
+USERNAME                       EXPIRY_D DEFAULT_TABLESPACE             CREATED  
+------------------------------ -------- ------------------------------ -------- 
+KIM2                           18/05/29 ORADATA                        17/11/30 
+
+SQL> create table s1(id number);
+
+테이블이 생성되었습니다.
+
+SQL> desc user_tables;
+ 이름                                      널?      유형
+ ----------------------------------------- -------- ----------------------------
+ TABLE_NAME                                NOT NULL VARCHAR2(30)
+ TABLESPACE_NAME                                    VARCHAR2(30)
+ CLUSTER_NAME                                       VARCHAR2(30)
+ IOT_NAME                                           VARCHAR2(30)
+ STATUS                                             VARCHAR2(8)
+ PCT_FREE                                           NUMBER
+ PCT_USED                                           NUMBER
+ INI_TRANS                                          NUMBER
+ MAX_TRANS                                          NUMBER
+ INITIAL_EXTENT                                     NUMBER
+ NEXT_EXTENT                                        NUMBER
+ MIN_EXTENTS                                        NUMBER
+ MAX_EXTENTS                                        NUMBER
+ PCT_INCREASE                                       NUMBER
+ FREELISTS                                          NUMBER
+ FREELIST_GROUPS                                    NUMBER
+ LOGGING                                            VARCHAR2(3)
+ BACKED_UP                                          VARCHAR2(1)
+ NUM_ROWS                                           NUMBER
+ BLOCKS                                             NUMBER
+ EMPTY_BLOCKS                                       NUMBER
+ AVG_SPACE                                          NUMBER
+ CHAIN_CNT                                          NUMBER
+ AVG_ROW_LEN                                        NUMBER
+ AVG_SPACE_FREELIST_BLOCKS                          NUMBER
+ NUM_FREELIST_BLOCKS                                NUMBER
+ DEGREE                                             VARCHAR2(10)
+ INSTANCES                                          VARCHAR2(10)
+ CACHE                                              VARCHAR2(5)
+ TABLE_LOCK                                         VARCHAR2(8)
+ SAMPLE_SIZE                                        NUMBER
+ LAST_ANALYZED                                      DATE
+ PARTITIONED                                        VARCHAR2(3)
+ IOT_TYPE                                           VARCHAR2(12)
+ TEMPORARY                                          VARCHAR2(1)
+ SECONDARY                                          VARCHAR2(1)
+ NESTED                                             VARCHAR2(3)
+ BUFFER_POOL                                        VARCHAR2(7)
+ FLASH_CACHE                                        VARCHAR2(7)
+ CELL_FLASH_CACHE                                   VARCHAR2(7)
+ ROW_MOVEMENT                                       VARCHAR2(8)
+ GLOBAL_STATS                                       VARCHAR2(3)
+ USER_STATS                                         VARCHAR2(3)
+ DURATION                                           VARCHAR2(15)
+ SKIP_CORRUPT                                       VARCHAR2(8)
+ MONITORING                                         VARCHAR2(3)
+ CLUSTER_OWNER                                      VARCHAR2(30)
+ DEPENDENCIES                                       VARCHAR2(8)
+ COMPRESSION                                        VARCHAR2(8)
+ COMPRESS_FOR                                       VARCHAR2(12)
+ DROPPED                                            VARCHAR2(3)
+ READ_ONLY                                          VARCHAR2(3)
+ SEGMENT_CREATED                                    VARCHAR2(3)
+ RESULT_CACHE                                       VARCHAR2(7)
+
+SQL> select table_name,tablespace_name from user_tables;
+
+TABLE_NAME                     TABLESPACE_NAME                                  
+------------------------------ ------------------------------                   
+S1                             ORADATA                                          
+
+SQL> create temporary tablespace temp3 tempfile 'd:\data3\temp3.dbf'
+  2      size 50m;
+create temporary tablespace temp3 tempfile 'd:\data3\temp3.dbf'
+*
+1행에 오류:
+ORA-01031: 권한이 불충분합니다 
+
+
+SQL> show user
+USER은 "KIM2"입니다
+SQL> conn / as sysdba
+연결되었습니다.
+SQL> create temporary tablespace temp3 tempfile 'd:\data3\temp3.dbf'
+  2      size 50m;
+
+테이블스페이스가 생성되었습니다.
+
+SQL> create user lee2 identified by lee2 default tablespace oradata
+  2      temporary tablespace temp3;
+
+사용자가 생성되었습니다.
+
+SQL> spool off

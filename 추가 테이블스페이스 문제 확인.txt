@@ -1,0 +1,146 @@
+admin 추가 문제
+
+<문1>테이블스페이스 부족->용량을 잘못계산->수정?
+ 할 수있는 조회할 수 SQL?=>dba_data_files테이블
+
+tablespace_name(논리적인 테이블스페이스 이름)
+file_name(물리적인 테이블스페이스이름)
+autoextensible(용량이 부족하면 확장이 가능유무)
+
+sql>select tablespace_name,file_name,autoextensible 
+      from dba_data_files;
+
+TABLESPACE_NAME
+------------------------------
+FILE_NAME
+-----------------------------------------------
+
+AUT
+---
+USERS
+C:\ORACLE\ORADATA\ORCL\USERS01.DBF
+YES  ==>용량이 부족하면 용량을 확장이 가능한 상태
+
+UNDOTBS1
+C:\ORACLE\ORADATA\ORCL\UNDOTBS01.DBF
+YES
+
+TABLESPACE_NAME
+------------------------------
+FILE_NAME
+-----------------------------------------------
+
+AUT
+---
+
+SYSAUX
+C:\ORACLE\ORADATA\ORCL\SYSAUX01.DBF
+YES
+
+SYSTEM
+C:\ORACLE\ORADATA\ORCL\SYSTEM01.DBF
+
+TABLESPACE_NAME
+------------------------------
+FILE_NAME
+-----------------------------------------------
+
+AUT
+---
+YES
+
+EXAMPLE
+C:\ORACLE\ORADATA\ORCL\EXAMPLE01.DBF
+YES
+
+ORADATA2
+
+TABLESPACE_NAME
+------------------------------
+FILE_NAME
+-----------------------------------------------
+
+AUT
+---
+C:\WEBTEST\1.DB\ORADATA2.DBF
+NO  ====>기존에 존재하는 테이블스페이스말고 새로 만드는 경우
+                 디폴트가 확장이 제한적이다는 알수 있다.(50m)->200m
+
+SHOP
+D:\DATA\SHOP1.DBF
+NO
+
+
+TABLESPACE_NAME
+------------------------------
+FILE_NAME
+-----------------------------------------------
+
+AUT
+---
+SHOP2
+D:\DATA2\SHOP2.DBF
+NO
+
+
+8 개의 행이 선택되었습니다.
+
+SQL>
+
+기존의 테이블스페이스의 용량을 확장시키는 방법
+(부족->얼마큰 확장-->최대로 용량)
+
+형식1) alter database datafile '경로포함해서 변경할 파일명.dbf' 
+autoextend on next 증가치(n)m maxsize 최대용량크기(m)
+
+ oradata2.dbf
+
+sql>alter database datafile 'c:\webtest\2.db\oradata.dbf' 
+      autoextend on next 2m maxsize 200m;  //50m->52,54,,,200m
+
+데이터베이스가 변경되었습니다.
+
+형식2) 50m->바로 200m로 파일 추가
+
+                        oradata ----- oradata.dbf+oradata2.dbf+~+~
+alter tablespace 변경시킬ts명 add datafile '경로포함해서 새로운파일명'
+size nm;
+
+sql>alter tablespace oradata add datafile 
+      'c:\webtest\2.db\oradata.dbf' size 200m;
+------------------------------------------------------------------
+                               oradata3.dbf 300m, oradata4.dbf 400m
+
+==>오라클이 접속할때 오류==>외부에서 ~.dbf을 삭제,변경=>
+==>오라클 문제발생
+
+테이블스페이스를 삭제하는 방법->내용(테이블) 및 파일 삭제
+형식) drop tablespace 삭제시킬ts명 including contents and datafiles;
+sql>drop tablespace shop2 including contents and datafiles;
+
+테이블스페이스가 삭제되었습니다.
+
+sql>spool off
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

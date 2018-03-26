@@ -1,0 +1,154 @@
+*****오라클의 페이징 처리 기법*****
+------------------------------------
+인라인 뷰로 TOP-N 구하기(랭킹을 설정)
+
+테이블에 데이터가 많은 상태->화면구현(테이블에 출력)
+->페이지당 10(default)~20개 정도 출력
+
+***********
+1.rownum =>내부적으로 각각의 행(=레코드)을 구분해서 번호를 매기면서 출력시켜주는
+           오라클의 예약어(내부적인 구분자)
+***********
+sql>select empno,ename from emp  //테이블에 저장된 순서대로 출력
+
+     EMPNO ENAME
+---------- ----------
+1      7369 SMITH
+2      7499 ALLEN
+3      7521 WARD
+4      7566 JONES
+      7654 MARTIN
+      7698 BLAKE
+      7782 CLARK
+      7788 SCOTT
+      7839 KING
+      7844 TURNER
+      7876 ADAMS
+
+     EMPNO ENAME
+---------- ----------
+      7900 JAMES
+      7902 FORD
+      7934 MILLER
+
+14 개의 행이 선택되었습니다.
+
+
+ed
+
+  1* select rownum,empno,ename from emp
+  2  ;
+
+    ROWNUM      EMPNO ENAME
+---------- ---------- ----------
+         1       7369 SMITH
+         2       7499 ALLEN
+         3       7521 WARD
+         4       7566 JONES
+         5       7654 MARTIN
+         6       7698 BLAKE
+         7       7782 CLARK
+         8       7788 SCOTT
+         9       7839 KING
+        10       7844 TURNER
+        11       7876 ADAMS
+
+    ROWNUM      EMPNO ENAME
+---------- ---------- ----------
+        12       7900 JAMES
+        13       7902 FORD
+        14       7934 MILLER
+
+14 개의 행이 선택되었습니다.
+
+SQL> ed
+
+  1* select rownum empno,ename from emp
+  2  ;
+
+     EMPNO ENAME
+---------- ----------
+         1 SMITH
+         2 ALLEN
+         3 WARD
+         4 JONES
+         5 MARTIN
+         6 BLAKE
+         7 CLARK
+         8 SCOTT
+         9 KING
+        10 TURNER
+        11 ADAMS
+
+     EMPNO ENAME
+---------- ----------
+        12 JAMES
+        13 FORD
+        14 MILLER
+
+14 개의 행이 선택되었습니다.
+
+SQL>
+
+*********************************************************************
+<문제16>emp테이블에서 가장 최근에 입사한 5명의 사원의 이름과 입사일을
+                     ---------------------------------------
+                     order by 필드명 desc
+출력하시오.=>내부적으로 순위를 매기면서 출력(Top-N(임의의 수))기법
+
+
+공식) select rownum "별칭명",필드명1,필드명2,,필드명n
+       from (
+         select 필드명,,,
+         from 테이블명
+         order by top-N 필드명(정렬하고자하는 필드명) desc
+       ) 테이블의 별치명
+       where 조건식(rownum <=top-N) ==>인라인 뷰
+
+
+sql>select rownum "num",ename,hiredate
+    from (
+         select ename,hiredate
+         from emp
+         order by hiredate desc
+    )
+    where rownum<=&num
+
+SQL> select rownum "num",ename,hiredate
+  2      from (
+  3           select ename,hiredate
+  4           from emp
+  5           order by hiredate desc
+  6      )
+  7      where rownum<=&num;
+num의 값을 입력하십시오: 5
+구   7:     where rownum<=&num
+신   7:     where rownum<=5
+
+       num ENAME      HIREDATE
+---------- ---------- --------
+         1 ADAMS      87/05/23
+         2 SCOTT      87/04/19
+         3 MILLER     82/01/23
+         4 JAMES      81/12/03
+         5 FORD       81/12/03
+
+SQL> /
+num의 값을 입력하십시오: 3
+구   7:     where rownum<=&num
+신   7:     where rownum<=3
+
+       num ENAME      HIREDATE
+---------- ---------- --------
+         1 ADAMS      87/05/23
+         2 SCOTT      87/04/19
+         3 MILLER     82/01/23
+
+SQL>
+
+**********************************************************************
+
+
+
+
+
